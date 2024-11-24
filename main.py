@@ -1,6 +1,19 @@
 import pygame
 import math
-from hive.constants import WIDTH, HEIGHT, FPS, LAYOUT_FLAT, BLACK
+from hive.constants import (
+    WIDTH,
+    HEIGHT,
+    FPS,
+    LAYOUT_FLAT,
+    BLACK,
+    GRID_WIDTH,
+    GRID_HEIGHT,
+    HEX_RADIUS,
+    LAYOUT,
+    WHITE,
+    RED,
+    background_image,
+)
 from hive.helper import *
 
 pygame.init()
@@ -9,17 +22,8 @@ WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 
 pygame.display.set_caption("Hive")
 
-GRID_WIDTH = 8
-GRID_HEIGHT = 8
-HEX_RADIUS = 30
-layout = Layout(
-    LAYOUT_FLAT,
-    Point(HEX_RADIUS, HEX_RADIUS),
-    Point(WIDTH // 2, HEIGHT // 2),
-)
 
-
-def draw_hex(hex: Hex, color: tuple[int] = BLACK, layout: Layout = layout, WIN=WIN):
+def draw_hex(hex: Hex, color: tuple[int] = BLACK, layout: Layout = LAYOUT, WIN=WIN):
     """Draw a single Hexagon on the screen."""
     corners = polygon_corners(layout, hex)
     points = [(corner.x, corner.y) for corner in corners]
@@ -36,14 +40,13 @@ def main():
             if event.type == pygame.QUIT:
                 run = False
 
-        WIN.fill((0, 0, 0))
+        # WIN.blit(background_image, (0, 0))
 
         # Draw the hex grid
-        for q in range(-GRID_WIDTH // 2, GRID_WIDTH // 2):
-            for r in range(-GRID_HEIGHT // 2, GRID_HEIGHT // 2):
-                hex = Hex(q, r)
-                color = (255, 255, 255)  # White color for the grid
-                draw_hex(hex, color)
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            pos = pygame.mouse.get_pos()
+            hex = pixel_to_hex(LAYOUT, pos)
+            draw_hex(hex, RED)
         pygame.display.update()
     pygame.quit()
 
