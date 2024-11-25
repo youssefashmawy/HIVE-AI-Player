@@ -1,4 +1,6 @@
 class Orientation:
+    """Helps Layout class define orientation of the hexagon"""
+
     def __init__(
         self,
         f: tuple[float],

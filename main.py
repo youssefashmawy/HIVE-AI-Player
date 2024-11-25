@@ -1,32 +1,19 @@
 import pygame
 import math
 from hive.constants import (
-    WIDTH,
-    HEIGHT,
     FPS,
-    BLACK,
     LAYOUT,
-    WHITE,
-    RED,
     BLUE,
     background_image,
+    WIN,
 )
 from hive.helper import *
 
 pygame.init()
 
-WIN = pygame.display.set_mode((WIDTH, HEIGHT))
+
 pygame.display.set_caption("Hive")
 WIN.blit(background_image, (0, 0))
-
-
-def draw_hex(
-    hex: Hex, color: tuple[int] = BLACK, layout: Layout = LAYOUT, WIN=WIN, width=1
-):
-    """Draw a single Hexagon on the screen."""
-    corners = polygon_corners(layout, hex)
-    points = [(corner.x, corner.y) for corner in corners]
-    pygame.draw.polygon(WIN, color, points, width)
 
 
 def main():

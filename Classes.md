@@ -3,33 +3,51 @@
 ```mermaid
 classDiagram
     Board: +List[List] board
-    Board: +Piece selected_piece
+    Board: +Hex selected_piece
     Board: +int black_pieces_cout
     Board: +int white_pieces_cout
     Board: +draw()-> None
-    Board: +all_possible_moves(Piece, int, int)-> None
-    Board: +get_piece(Piece, int, int)-> Piece
-
-    Hex:+int r
-    Hex:+int q
-    Hex:+int s
+    Board: +all_possible_moves(Hex, int, int)-> None
+    Board: +get_piece(Hex, int, int)-> Hex
 
 
-    Orientation:+int f
-    Orientation:+int b
-    Orientation:+int start_angle = 0
+    class Orientation{
+    +int f
+    +int b
+    +int start_angle = 0
+    def __init__(f:tuple[float] , b:tuple[float], start_angle:int =0):
+    }
+    
 
-    Piece: +int q
-    Piece: +int r
-    Piece: +int s
-    Piece: +int PADDING
-    Piece: +int OUTLINE
-    Piece: +int color
-    Piece: +calc_pos()
-    Piece: +draw(img, q, r)
-    Piece: +generate_allowed_placement()
-    Piece: +all_possible_moves()*
-    Piece: +generate_allowed_all_possible_movess()*
+    class Hex{
+        +int q
+        +int r
+        +int s
+        +int GAP
+        +__init__(q: int, r: int)
+        +__repr__() str
+        +calc_pos()
+        +draw(img, q, r)
+        +generate_allowed_placement()
+        +all_possible_moves()*
+        +generate_allowed_all_possible_movess()*
+    }
+
+    class Point {
+        +int y
+        +int x
+        +__init__(x: int, y: int)
+        +__add__(other: Point) Point
+        +__sub__(other: Point) Point
+        +__repr__() str
+    }
+    class Layout{
+        +Orientation orientation,
+        +Point size,
+        +Point origin
+        +__init__(orientation: Orientation,size: Point,origin: Point = Point(0, 0))
+    }
+
 
     class SoldierAnt{
         +int count = 3
@@ -53,17 +71,20 @@ classDiagram
         +all_possible_moves()
         +generate_allowed_all_possible_movess()
     }
-        class Spider{
+    class Spider{
         +int count = 2
         +all_possible_moves()
         +generate_allowed_all_possible_movess()
     }
 
-    Board o-- Piece
-    Piece <|-- SoldierAnt
-    Piece <|-- Beetles
-    Piece <|-- QueenBee
-    Piece <|-- GrassHoppers
-    Piece <|-- Spider
+
+    Layout o-- Point
+    Layout o-- Orientation
+    Board o-- Hex
+    Hex <|-- SoldierAnt
+    Hex <|-- Beetles
+    Hex <|-- QueenBee
+    Hex <|-- GrassHoppers
+    Hex <|-- Spider
 
 ```
