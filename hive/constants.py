@@ -18,6 +18,8 @@ PIECES_SCALING = (44, 24)
 # Images
 background_image = pygame.image.load("Assets/board_background.jpg")
 
+
+
 # Black pieces
 black_ant = pygame.transform.scale(
     pygame.image.load("Assets/black_ant.png"), PIECES_SCALING
@@ -34,6 +36,7 @@ black_grasshopper = pygame.transform.scale(
 black_beetle = pygame.transform.scale(
     pygame.image.load("Assets/black_beetle.png"), PIECES_SCALING
 )
+
 
 # White pieces
 white_ant = pygame.transform.scale(
@@ -54,7 +57,6 @@ white_beetle = pygame.transform.scale(
 
 
 # Hexagon constants
-
 
 GRID_WIDTH = 2
 GRID_HEIGHT = 2

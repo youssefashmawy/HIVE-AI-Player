@@ -4,20 +4,29 @@
 classDiagram
     Board: +List[List] board
     Board: +Piece selected_piece
-    Board: +int red_left
-    Board: +int white_left
-    Board: +draw_hexagons()-> None
+    Board: +int black_pieces_cout
+    Board: +int white_pieces_cout
     Board: +draw()-> None
     Board: +all_possible_moves(Piece, int, int)-> None
     Board: +get_piece(Piece, int, int)-> Piece
 
-    Piece: +int row
-    Piece: +int col
+    Hex:+int r
+    Hex:+int q
+    Hex:+int s
+
+
+    Orientation:+int f
+    Orientation:+int b
+    Orientation:+int start_angle = 0
+
+    Piece: +int q
+    Piece: +int r
+    Piece: +int s
     Piece: +int PADDING
     Piece: +int OUTLINE
     Piece: +int color
     Piece: +calc_pos()
-    Piece: +draw(img, x, y)
+    Piece: +draw(img, q, r)
     Piece: +generate_allowed_placement()
     Piece: +all_possible_moves()*
     Piece: +generate_allowed_all_possible_movess()*

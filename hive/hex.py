@@ -14,3 +14,6 @@ class Hex:
             print("Error in hex.py")
             return NotImplemented
         return (self.q, self.r) == (other.q, other.r)
+
+    def __repr__(self):
+        return f"Point({self.q}, {self.r}, {self.s})"
