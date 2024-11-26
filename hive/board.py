@@ -42,10 +42,15 @@ class Board:
                 return piece
         raise ValueError("Element doesn't exist in remove_piece_by_hex function")
 
-    def select_piece_by_hex(self, hex: Hex):
+    def select_piece_by_hex(self, hex: Hex) -> Piece:
         for piece in self.board:
             if piece.hex.q == hex.q and piece.hex.r == hex.r and piece.hex.s == hex.s:
                 return piece
         raise ValueError("Element doesn't exist in select_piece_by_hex function")
 
-    def move(self, hex: Hex): ...
+    def move(self, from_hex: Hex, to_hex: Hex): 
+        piece = self.select_piece_by_hex(from_hex)
+        if to_hex in piece.get_legal_moves():
+            self.remove_piece_by_hex(from_hex)
+            piece.hex = to_hex
+            self.board.append(piece)

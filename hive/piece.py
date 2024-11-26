@@ -1,4 +1,5 @@
 from .hex import Hex
+from abc import abstractmethod
 
 
 class Piece(Hex):
@@ -12,3 +13,6 @@ class Piece(Hex):
         return (
             f"Name: {self.piece_name}" + f"Type:{self.piece_type}" + super().__repr__()
         )
+    @abstractmethod
+    def get_legal_moves() -> list[Hex]:
+        pass
