@@ -7,6 +7,7 @@ classDiagram
         +Hex selected_piece
         +int black_pieces_placed
         +int white_pieces_placed
+        +int difficulty
         +__init__(selected_piece: Hex)
         +set_selected_piece(selected_piece: Hex)
         +increment_pieces_placed(piece: Piece)
@@ -67,11 +68,13 @@ classDiagram
 
     class SoldierAnt{
         +int count = 3
+        +__init__(diffculty:int,...)
         +all_possible_moves()
         get_legal_moves_piece()
     }    
     class Beetles{
         +int count = 2
+        +__init__(diffculty:int,...)
         +all_possible_moves()
         +get_legal_moves_piece()
     }
@@ -79,16 +82,19 @@ classDiagram
         +int count = 1
         +int count_neighbours
         +bool is_surrounded
+        +__init__(diffculty:int,...)
         +all_possible_moves()
         +get_legal_moves_piece()
     }
     class GrassHoppers{
         +int count = 3
+        +__init__(diffculty:int,...)
         +all_possible_moves()
         +get_legal_moves_piece()
     }
     class Spider{
         +int count = 2
+        +__init__(diffculty:int,...)
         +all_possible_moves()
         +get_legal_moves_piece()
     }

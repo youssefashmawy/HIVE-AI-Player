@@ -5,12 +5,14 @@ from .piece import Piece
 class Board:
     def __init__(
         self,
+        difficulty: int,
         selected_piece: Hex = Hex(0, 0),
     ):
         self.board = []
         self.selected_piece = selected_piece
         self.black_pieces_placed = 0
         self.white_pieces_placed = 0
+        self.difficulty = difficulty
 
     def set_selected_piece(self, selected_piece: Hex):
         self.selected_piece = selected_piece
@@ -48,7 +50,7 @@ class Board:
                 return piece
         raise ValueError("Element doesn't exist in select_piece_by_hex function")
 
-    def move(self, from_hex: Hex, to_hex: Hex): 
+    def move(self, from_hex: Hex, to_hex: Hex):
         piece = self.select_piece_by_hex(from_hex)
         if to_hex in piece.get_legal_moves():
             self.remove_piece_by_hex(from_hex)
