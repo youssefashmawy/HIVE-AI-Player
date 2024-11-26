@@ -16,7 +16,7 @@ WHITE = (255, 255, 255)
 GREY = (128, 128, 128)
 
 FPS = 15
-PIECES_SCALING = (90, 90)
+PIECES_SCALING = (70, 70)
 
 
 # Images

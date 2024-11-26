@@ -27,7 +27,7 @@ class Board:
     def __repr__(self):
         return f"Board = {self.board}"
 
-    def remove_piece(self, hex: Hex) -> Piece | None:
+    def remove_piece_by_hex(self, hex: Hex) -> Piece | None:
         """removes a piece from the board and returns it
 
         Args:
@@ -40,7 +40,12 @@ class Board:
             if piece.hex.q == hex.q and piece.hex.r == hex.r and piece.hex.s == hex.s:
                 self.board.remove(piece)
                 return piece
-        print("Element doesn't exist")
-        return None
+        raise ValueError("Element doesn't exist in remove_piece_by_hex function")
+
+    def select_piece_by_hex(self, hex: Hex):
+        for piece in self.board:
+            if piece.hex.q == hex.q and piece.hex.r == hex.r and piece.hex.s == hex.s:
+                return piece
+        raise ValueError("Element doesn't exist in select_piece_by_hex function")
 
     def move(self, hex: Hex): ...
