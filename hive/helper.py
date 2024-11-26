@@ -3,7 +3,7 @@ from .point import Point
 from .hex import Hex
 from math import pi, cos, sin
 import pygame
-from .constants import LAYOUT, BLACK, WIN
+from .constants import LAYOUT, BLACK, WIN, BLUE
 
 
 def hex_to_pixel(layout: Layout, h: Hex) -> Point:
@@ -78,7 +78,7 @@ def polygon_corners(layout: Layout, h: Hex) -> list[Point]:
 
 
 def draw_hex(
-    hex: Hex, color: tuple[int] = BLACK, layout: Layout = LAYOUT, WIN=WIN, width=1
+    hex: Hex, color: tuple[int] = BLUE, layout: Layout = LAYOUT, WIN=WIN, width=1
 ):
     """Draw a single Hexagon on the screen."""
     corners = polygon_corners(layout, hex)

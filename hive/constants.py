@@ -4,7 +4,7 @@ from math import sqrt
 from hive.layout import Layout
 from hive.point import Point
 
-WIDTH, HEIGHT = 800, 600
+WIDTH, HEIGHT = 900, 750
 
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 
@@ -15,8 +15,8 @@ BLUE = (0, 0, 255)
 WHITE = (255, 255, 255)
 GREY = (128, 128, 128)
 
-FPS = 60
-PIECES_SCALING = (44, 24)
+FPS = 15
+PIECES_SCALING = (90, 90)
 
 
 # Images
@@ -66,6 +66,7 @@ GRID_HEIGHT = 2
 HEX_RADIUS = 30
 
 # Flat top calculation
+
 LAYOUT_FLAT = Orientation(
     (3.0 / 2.0, 0.0, sqrt(3.0) / 2.0, sqrt(3.0)),
     (2.0 / 3.0, 0.0, -1.0 / 3.0, sqrt(3.0) / 3.0),

@@ -15,7 +15,7 @@ classDiagram
     +int f
     +int b
     +int start_angle = 0
-    def __init__(f:tuple[float] , b:tuple[float], start_angle:int =0):
+    def __init__(f:tuple[float] , b:tuple[float], start_angle:int =0) 
     }
     
 
