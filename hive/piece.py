@@ -1,7 +1,7 @@
 from .hex import Hex
 
 
-class piece(Hex):
+class Piece(Hex):
     def __init__(self, hex, piece_name: str, piece_type: str):
         self.hex = hex
         assert piece_type.lower() == "black" or piece_type.lower() == "white"

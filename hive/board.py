@@ -1,4 +1,5 @@
 from .hex import Hex
+from .piece import Piece
 
 
 class Board:
@@ -14,37 +15,29 @@ class Board:
     def set_selected_piece(self, selected_piece: Hex):
         self.selected_piece = selected_piece
 
-    def increment_pieces_placed(self, hex: Hex, piece_name: str, piece_type: str):
+    def increment_pieces_placed(self, piece: Piece):
 
-        self.board.insert(
-            0,
-            [
-                piece_name.lower(),
-                piece_type.lower(),
-                hex.q,
-                hex.r,
-                hex.s,
-            ],
-        )
-        if piece_type.lower() == "black":
+        self.board.insert(0, piece)
+
+        if piece.piece_type == "black":
             self.black_pieces_placed += 1
-        elif piece_type.lower() == "white":
+        elif piece.piece_type == "white":
             self.white_pieces_placed += 1
 
     def __repr__(self):
         return f"Board = {self.board}"
 
-    def remove_piece(self, hex: Hex) -> list[str, str, int, int, int]:
+    def remove_piece(self, hex: Hex) -> Piece | None:
         """removes a piece from the board and returns it
 
         Args:
             hex (Hex): Pressed element required to be moved
 
         Returns:
-            list[str,str,int,int,int]: The element in the board required to be removed with the following values piece_name, piece_type(black or white), q, r, s
+            Piece: The element in the board required to be removed
         """
         for piece in self.board:
-            if piece[2] == hex.q and piece[3] == hex.r and piece[4] == hex.s:
+            if piece.hex.q == hex.q and piece.hex.r == hex.r and piece.hex.s == hex.s:
                 self.board.remove(piece)
                 return piece
         print("Element doesn't exist")
