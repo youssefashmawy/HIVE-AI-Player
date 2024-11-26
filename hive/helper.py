@@ -101,36 +101,99 @@ def draw_hex(
 
 
 def draw_pieces():
-
     # Define positions for black pieces (left side)
-
     black_positions = [
-        (50, 50),
-        (50, 150),
-        (50, 250),
-        (50, 350),
-        (50, 450),
+        Hex(-8, -2),
+        Hex(-8, 0),
+        Hex(-8, 2),
+        Hex(-8, 4),
+        Hex(-8, 6),
     ]
+    black_positions = [hex_to_pixel(LAYOUT, hex) for hex in black_positions]
 
     # Define positions for white pieces (right side)
     white_positions = [
-        (700, 50),
-        (700, 150),
-        (700, 250),
-        (700, 350),
-        (700, 450),
+        Hex(8, -10),
+        Hex(8, -8),
+        Hex(8, -6),
+        Hex(8, -4),
+        Hex(8, -2),
     ]
+    white_positions = [hex_to_pixel(LAYOUT, hex) for hex in white_positions]
+
+    # Get the size of the images
+    piece_width, piece_height = black_ant.get_size()
 
     # Draw black pieces
-    WIN.blit(black_ant, black_positions[0])
-    WIN.blit(black_spider, black_positions[1])
-    WIN.blit(black_queen, black_positions[2])
-    WIN.blit(black_grasshopper, black_positions[3])
-    WIN.blit(black_beetle, black_positions[4])
+    WIN.blit(
+        black_ant,
+        (
+            black_positions[0].x - piece_width // 2,
+            black_positions[0].y - piece_height // 2,
+        ),
+    )
+    WIN.blit(
+        black_spider,
+        (
+            black_positions[1].x - piece_width // 2,
+            black_positions[1].y - piece_height // 2,
+        ),
+    )
+    WIN.blit(
+        black_queen,
+        (
+            black_positions[2].x - piece_width // 2,
+            black_positions[2].y - piece_height // 2,
+        ),
+    )
+    WIN.blit(
+        black_grasshopper,
+        (
+            black_positions[3].x - piece_width // 2,
+            black_positions[3].y - piece_height // 2,
+        ),
+    )
+    WIN.blit(
+        black_beetle,
+        (
+            black_positions[4].x - piece_width // 2,
+            black_positions[4].y - piece_height // 2,
+        ),
+    )
 
     # Draw white pieces
-    WIN.blit(white_ant, white_positions[0])
-    WIN.blit(white_spider, white_positions[1])
-    WIN.blit(white_queen, white_positions[2])
-    WIN.blit(white_grasshopper, white_positions[3])
-    WIN.blit(white_beetle, white_positions[4])
+    WIN.blit(
+        white_ant,
+        (
+            white_positions[0].x - piece_width // 2,
+            white_positions[0].y - piece_height // 2,
+        ),
+    )
+    WIN.blit(
+        white_spider,
+        (
+            white_positions[1].x - piece_width // 2,
+            white_positions[1].y - piece_height // 2,
+        ),
+    )
+    WIN.blit(
+        white_queen,
+        (
+            white_positions[2].x - piece_width // 2,
+            white_positions[2].y - piece_height // 2,
+        ),
+    )
+    WIN.blit(
+        white_grasshopper,
+        (
+            white_positions[3].x - piece_width // 2,
+            white_positions[3].y - piece_height // 2,
+        ),
+    )
+    WIN.blit(
+        white_beetle,
+        (
+            white_positions[4].x - piece_width // 2,
+            white_positions[4].y - piece_height // 2,
+        ),
+    )

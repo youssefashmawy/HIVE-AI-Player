@@ -5,7 +5,6 @@ from hive.constants import (
     BLUE,
     background_image,
     WIN,
-
 )
 from hive.helper import *
 
@@ -15,6 +14,7 @@ pygame.display.set_caption("Hive")
 WIN.blit(background_image, (0, 0))
 
 draw_pieces()
+
 
 def main():
     run = True
@@ -33,6 +33,7 @@ def main():
             pos = pygame.mouse.get_pos()
             hex = pixel_to_hex(LAYOUT, pos)
             print(hex)
+            print(pos)
             draw_hex(hex, BLUE, width=5)
         pygame.display.update()
     pygame.quit()

@@ -16,7 +16,7 @@ WHITE = (255, 255, 255)
 GREY = (128, 128, 128)
 
 FPS = 15
-PIECES_SCALING = (70, 70)
+PIECES_SCALING = (60, 60)
 
 
 # Images
@@ -61,8 +61,8 @@ white_beetle = pygame.transform.scale(
 
 # Hexagon constants
 
-GRID_WIDTH = 2
-GRID_HEIGHT = 2
+GRID_WIDTH = 6
+GRID_HEIGHT = 6
 HEX_RADIUS = 30
 
 # Flat top calculation
