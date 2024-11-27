@@ -11,6 +11,12 @@ class Piece(Hex):
 
     def __repr__(self) -> str:
         return f"{self.piece_type.capitalize()} {self.piece_name.capitalize()} at {self.hex}"
+    
+    def __eq__(self, other: "Piece"):
+        if not isinstance(other, Hex):
+            print("Error in hex.py")
+            return NotImplemented
+        return (self.hex) == (other.hex)
 
     @abstractmethod
     def get_legal_moves() -> list[Hex]:
