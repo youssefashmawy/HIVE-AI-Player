@@ -64,3 +64,14 @@ class Board:
                 print("Invalid move")
         else:
             print("Piece not found at the given hex")
+
+    def turn(self) -> bool:
+        """Returns the turn of the current player
+
+        Returns:
+            bool: True -> white, False -> black
+        """
+
+        if self.board[0] == None or self.board[0].piece_type == "white":
+            return True
+        return False

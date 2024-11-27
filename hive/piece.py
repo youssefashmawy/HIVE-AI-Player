@@ -1,4 +1,5 @@
 from .hex import Hex
+from .piece import Piece
 from abc import abstractmethod
 
 
@@ -11,7 +12,7 @@ class Piece(Hex):
 
     def __repr__(self) -> str:
         return f"{self.piece_type.capitalize()} {self.piece_name.capitalize()} at {self.hex}"
-    
+
     def __eq__(self, other: "Piece"):
         if not isinstance(other, Hex):
             print("Error in hex.py")
@@ -19,5 +20,5 @@ class Piece(Hex):
         return (self.hex) == (other.hex)
 
     @abstractmethod
-    def get_legal_moves() -> list[Hex]:
+    def get_legal_moves() -> list[Piece]:
         pass

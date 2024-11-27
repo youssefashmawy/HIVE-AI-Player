@@ -3,18 +3,21 @@
 ```mermaid
 classDiagram
     class Board {
-        +List[Piece] board
-        +Hex selected_piece
-        +int black_pieces_placed
-        +int white_pieces_placed
-        +int difficulty
-        +__init__(selected_piece: Hex)
-        +set_selected_piece(selected_piece: Hex)
-        +increment_pieces_placed(piece: Piece)
-        +__repr__()
-        +remove_piece_by_hex(hex: Hex) Piece | None
-        +select_piece_by_hex(hex: Hex) Piece
-        +move(from_hex: Hex, to_hex: Hex)
+        -list~Piece~ board
+        -Hex selected_piece
+        -int black_pieces_placed
+        -int white_pieces_placed
+        -int difficulty
+
+        +Board(difficulty: int, selected_piece: Hex)
+        +set_selected_piece(selected_piece: Hex): void
+        +increment_pieces_placed(piece: Piece): void
+        +__repr__(): str
+        +remove_piece_by_hex(hex: Hex): Piece | None
+        +select_piece_by_hex(hex: Hex): Piece | None
+        +is_valid_move(piece: Piece, to_hex: Hex): bool
+        +move(from_hex: Hex, to_hex: Hex): void
+        +turn(): bool
     }
 
 
@@ -22,31 +25,29 @@ classDiagram
         +int f
         +int b
         +int start_angle = 0
-        def __init__(f:tuple[float] , b:tuple[float], start_angle:int =0) 
+        def Orientation(f:tuple[float] , b:tuple[float], start_angle:int =0) 
     }
 
     class Piece {
         +Hex hex
         +str piece_name
         +str piece_type
-        +__init__(hex: Hex, piece_name: str, piece_type: str)
-        +__repr__() str
-        +get_legal_moves_piece()* List[Hex]
+        +Piece(hex: Hex, piece_name: str, piece_type: str)
+        +__repr__(): str
+        +get_legal_moves_piece()*: List~Piece~
     }
     
 
-    class Hex{
-        +int q
-        +int r
-        +int s
-        +int GAP
-        +__init__(q: int, r: int)
-        +__repr__() str
-        +calc_pos()
-        +draw(img, q, r)
-        +generate_allowed_placement()
+    class Hex {
+        -int q
+        -int r
+        -int s
 
+        +Hex(q: int, r: int)
+        +__eq__(other: Hex): bool
+        +__repr__(): str
     }
+
 
     class Layout{
         +Orientation orientation,
@@ -59,43 +60,38 @@ classDiagram
     class Point {
         +int x
         +int y
-        +__init__(x: int, y: int)
-        +__add__(other: Point) Point
-        +__sub__(other: Point) Point
-        +__repr__() str
-        +round() Point
+        +Point(x: int, y: int)
+        +__add__(other: Point): Point
+        +__sub__(other: Point): Point
+        +__repr__(): str
+        +round(): Point
     }
 
     class SoldierAnt{
         +int count = 3
-        +__init__(diffculty:int,...)
-        +all_possible_moves()
-        get_legal_moves_piece()
+        +SoldierAnt(diffculty:int,...)
+        +get_legal_moves_piece()
     }    
     class Beetles{
         +int count = 2
-        +__init__(diffculty:int,...)
-        +all_possible_moves()
+        +Beetles(diffculty:int,...)
         +get_legal_moves_piece()
     }
     class QueenBee{
         +int count = 1
         +int count_neighbours
         +bool is_surrounded
-        +__init__(diffculty:int,...)
-        +all_possible_moves()
+        +QueenBee(diffculty:int,...)
         +get_legal_moves_piece()
     }
     class GrassHoppers{
         +int count = 3
-        +__init__(diffculty:int,...)
-        +all_possible_moves()
+        +GrassHoppers(diffculty:int,...)
         +get_legal_moves_piece()
     }
     class Spider{
         +int count = 2
-        +__init__(diffculty:int,...)
-        +all_possible_moves()
+        +Spider(diffculty:int,...)
         +get_legal_moves_piece()
     }
 
