@@ -2,6 +2,8 @@ from .layout import Layout
 from .point import Point
 from .hex import Hex
 from math import pi, cos, sin
+from .board import Board
+from .piece import Piece
 import pygame
 from .constants import (
     LAYOUT,
@@ -100,8 +102,36 @@ def draw_hex(
     pygame.draw.polygon(WIN, color, points, width)
 
 
-def draw_pieces():
-    # Define positions for black pieces (left side)
+def draw_pieces(board: Board):
+    piece_images = {
+        "black_ant": black_ant,
+        "black_spider": black_spider,
+        "black_queen": black_queen,
+        "black_grasshopper": black_grasshopper,
+        "black_beetle": black_beetle,
+        "white_ant": white_ant,
+        "white_spider": white_spider,
+        "white_queen": white_queen,
+        "white_grasshopper": white_grasshopper,
+        "white_beetle": white_beetle,
+    }
+
+    for piece in board.board:
+        position = hex_to_pixel(LAYOUT, piece.hex)
+        image = piece_images.get(f"{piece.piece_type}_{piece.piece_name}")
+        if image:
+            piece_width, piece_height = image.get_size()
+            WIN.blit(
+                image,
+                (
+                    position.x - piece_width // 2,
+                    position.y - piece_height // 2,
+                ),
+            )
+
+
+def setup_board(board: Board):
+    # Place black pieces on the left
     black_positions = [
         Hex(-8, -2),
         Hex(-8, 0),
@@ -109,9 +139,13 @@ def draw_pieces():
         Hex(-8, 4),
         Hex(-8, 6),
     ]
-    black_positions = [hex_to_pixel(LAYOUT, hex) for hex in black_positions]
+    black_piece_names = ["ant", "spider", "queen", "grasshopper", "beetle"]
 
-    # Define positions for white pieces (right side)
+    for position, name in zip(black_positions, black_piece_names):
+        piece = Piece(position, name, "black")
+        board.board.append(piece)
+
+    # Place white pieces on the right
     white_positions = [
         Hex(8, -10),
         Hex(8, -8),
@@ -119,81 +153,8 @@ def draw_pieces():
         Hex(8, -4),
         Hex(8, -2),
     ]
-    white_positions = [hex_to_pixel(LAYOUT, hex) for hex in white_positions]
+    white_piece_names = ["ant", "spider", "queen", "grasshopper", "beetle"]
 
-    # Get the size of the images
-    piece_width, piece_height = black_ant.get_size()
-
-    # Draw black pieces
-    WIN.blit(
-        black_ant,
-        (
-            black_positions[0].x - piece_width // 2,
-            black_positions[0].y - piece_height // 2,
-        ),
-    )
-    WIN.blit(
-        black_spider,
-        (
-            black_positions[1].x - piece_width // 2,
-            black_positions[1].y - piece_height // 2,
-        ),
-    )
-    WIN.blit(
-        black_queen,
-        (
-            black_positions[2].x - piece_width // 2,
-            black_positions[2].y - piece_height // 2,
-        ),
-    )
-    WIN.blit(
-        black_grasshopper,
-        (
-            black_positions[3].x - piece_width // 2,
-            black_positions[3].y - piece_height // 2,
-        ),
-    )
-    WIN.blit(
-        black_beetle,
-        (
-            black_positions[4].x - piece_width // 2,
-            black_positions[4].y - piece_height // 2,
-        ),
-    )
-
-    # Draw white pieces
-    WIN.blit(
-        white_ant,
-        (
-            white_positions[0].x - piece_width // 2,
-            white_positions[0].y - piece_height // 2,
-        ),
-    )
-    WIN.blit(
-        white_spider,
-        (
-            white_positions[1].x - piece_width // 2,
-            white_positions[1].y - piece_height // 2,
-        ),
-    )
-    WIN.blit(
-        white_queen,
-        (
-            white_positions[2].x - piece_width // 2,
-            white_positions[2].y - piece_height // 2,
-        ),
-    )
-    WIN.blit(
-        white_grasshopper,
-        (
-            white_positions[3].x - piece_width // 2,
-            white_positions[3].y - piece_height // 2,
-        ),
-    )
-    WIN.blit(
-        white_beetle,
-        (
-            white_positions[4].x - piece_width // 2,
-            white_positions[4].y - piece_height // 2,
-        ),
-    )
+    for position, name in zip(white_positions, white_piece_names):
+        piece = Piece(position, name, "white")
+        board.board.append(piece)

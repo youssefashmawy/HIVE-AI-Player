@@ -44,15 +44,23 @@ class Board:
                 return piece
         raise ValueError("Element doesn't exist in remove_piece_by_hex function")
 
-    def select_piece_by_hex(self, hex: Hex) -> Piece:
+    def select_piece_by_hex(self, hex: Hex) -> Piece | None:
         for piece in self.board:
             if piece.hex.q == hex.q and piece.hex.r == hex.r and piece.hex.s == hex.s:
                 return piece
-        raise ValueError("Element doesn't exist in select_piece_by_hex function")
+        # raise ValueError("Element doesn't exist in select_piece_by_hex function")
+
+    def is_valid_move(self, piece: Piece, to_hex: Hex) -> bool:
+        # game-specific logic here
+        # let's assume any empty hex is a valid move temp
+        return self.select_piece_by_hex(to_hex) is None
 
     def move(self, from_hex: Hex, to_hex: Hex):
         piece = self.select_piece_by_hex(from_hex)
-        if to_hex in piece.get_legal_moves():
-            self.remove_piece_by_hex(from_hex)
-            piece.hex = to_hex
-            self.board.append(piece)
+        if piece:
+            if self.is_valid_move(piece, to_hex):
+                piece.hex = to_hex
+            else:
+                print("Invalid move")
+        else:
+            print("Piece not found at the given hex")
