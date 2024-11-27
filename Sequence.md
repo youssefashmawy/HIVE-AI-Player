@@ -37,6 +37,7 @@ end
 UI ->> Player: Game Over
 
 ```
+
 <div style="text-align: center;">
     <img src="chillguy.png" height=400 alt="Just a chill guy">
 </div>
