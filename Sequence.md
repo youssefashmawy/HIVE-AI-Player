@@ -1,3 +1,5 @@
+# Sequence Diagram
+
 ```mermaid
 
 sequenceDiagram
@@ -35,4 +37,6 @@ end
 UI ->> Player: Game Over
 
 ```
-<img src="chillguy.png" height=400 alt="Just a chill guy">
+<div style="text-align: center;">
+    <img src="chillguy.png" height=400 alt="Just a chill guy">
+</div>
