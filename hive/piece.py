@@ -1,5 +1,4 @@
 from .hex import Hex
-from .piece import Piece
 from abc import abstractmethod
 
 
@@ -20,5 +19,5 @@ class Piece(Hex):
         return (self.hex) == (other.hex)
 
     @abstractmethod
-    def get_legal_moves() -> list[Piece]:
+    def get_legal_moves() -> list["Piece"]:
         pass
