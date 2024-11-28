@@ -8,9 +8,10 @@ class Piece(Hex):
         assert piece_type.lower() in ["black", "white"]
         self.piece_name = piece_name.lower()
         self.piece_type = piece_type.lower()
+        self.is_placed = False
 
     def __repr__(self) -> str:
-        return f"{self.piece_type.capitalize()} {self.piece_name.capitalize()} at {self.hex}"
+        return f"{self.piece_type.capitalize()} {self.piece_name.capitalize()} at {self.hex} was placed:{self.is_placed}"
 
     def __eq__(self, other: "Piece"):
         if not isinstance(other, Hex):

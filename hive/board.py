@@ -10,22 +10,17 @@ class Board:
     ):
         self.board = []
         self.selected_piece = selected_piece
-        self.black_pieces_placed = 0
-        self.white_pieces_placed = 0
+        self.black_pieces_moved = 0
+        self.white_pieces_moved = 0
         self.difficulty = difficulty
         self.is_first_move = True
 
-    def set_selected_piece(self, selected_piece: Hex):
+    def set_selected_piece(self, selected_piece: Hex) -> None:
         self.selected_piece = selected_piece
 
-    def increment_pieces_placed(self, piece: Piece):
+    def increment_pieces_placed(self, piece: Piece) -> None:
 
         self.board.insert(0, piece)
-
-        if piece.piece_type == "black":
-            self.black_pieces_placed += 1
-        elif piece.piece_type == "white":
-            self.white_pieces_placed += 1
 
     def __repr__(self):
         return f"Board = {self.board}"
@@ -62,6 +57,13 @@ class Board:
             if self.is_valid_move(piece, to_hex):
                 piece.hex = to_hex
                 self.is_first_move = False
+                piece.is_placed = True
+
+                if piece.piece_type == "black":
+                    self.black_pieces_moved += 1
+                elif piece.piece_type == "white":
+                    self.white_pieces_moved += 1
+
             else:
                 print("Invalid move")
         else:
@@ -77,3 +79,6 @@ class Board:
         if self.board[0] == None or self.board[0].piece_type == "white":
             return True
         return False
+
+    def total_moves(self) -> int:
+        return self.black_pieces_moved + self.white_pieces_moved
