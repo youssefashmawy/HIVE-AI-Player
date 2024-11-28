@@ -13,6 +13,7 @@ class Board:
         self.black_pieces_placed = 0
         self.white_pieces_placed = 0
         self.difficulty = difficulty
+        self.is_first_move = True
 
     def set_selected_piece(self, selected_piece: Hex):
         self.selected_piece = selected_piece
@@ -60,6 +61,7 @@ class Board:
         if piece:
             if self.is_valid_move(piece, to_hex):
                 piece.hex = to_hex
+                self.is_first_move = False
             else:
                 print("Invalid move")
         else:
