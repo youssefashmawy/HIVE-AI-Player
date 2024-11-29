@@ -49,6 +49,8 @@ def main():
             else:
                 # Try to move the selected piece to the clicked hex
                 if board.is_valid_move(selected_piece, hex_clicked):
+                    # Check breaking the hive
+                    print(board.not_break_hive(selected_piece), end="\n\n")
                     board.move(selected_piece.hex, hex_clicked)
                     print(f"Moved piece to {hex_clicked}")
                     board.remove_piece_by_hex(selected_piece.hex)
@@ -60,10 +62,18 @@ def main():
                     print("Invalid move. Please select a valid destination.")
                     selected_piece = None  # Deselect the piece
         draw_pieces(board)
-
         pygame.display.update()
     pygame.quit()
 
 
 if __name__ == "__main__":
     main()
+
+# TODO
+# Draw suggested moves using draw_hex
+# Add an outline to make hexas look nicer
+# Implement sliding algorithm
+# Implement not pinned
+# Implement immbolized
+# Implement AI vs player
+# Implement AI vs AI
