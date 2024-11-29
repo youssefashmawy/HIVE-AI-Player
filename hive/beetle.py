@@ -64,7 +64,7 @@ class Beetles(Piece):
 
     def get_legal_moves(self,board:Board):
        
-        legal_pieces = []
+        legal_moves = []
         # just to know initial state of this piece
         initialHex = None
         if(self.piece_type == "white"):
@@ -88,11 +88,8 @@ class Beetles(Piece):
                     new_Hex = Hex(current_Hex.q + move[0],current_Hex.r + move[1])
                     #  if a piece found with same hex: (Go on top of another piece regardless of its color)
                     if(self.__isPieceFound(board,new_Hex)):
-                        valid_piece = Piece(hex=new_Hex,
-                                            piece_name=self.piece_name,
-                                            piece_type=self.piece_type
-                                            )
-                        legal_pieces.append(valid_piece)        
+                        
+                        legal_moves.append(new_Hex)        
                     #else if new hex has no piece 
                     else:
                         # for each move from the new hex in iterative moves
@@ -101,32 +98,21 @@ class Beetles(Piece):
                             hexadjacent = Hex(new_Hex.q + m[0],new_Hex.r + m[1])
                             # if it has a piece
                             
-                            if (self.__isPieceFound(board,hexadjacent)):
+                            if (self.__isPieceFoundAndNotSame(board,hexadjacent) ):
                             #    push newhex to my_moves
-                                valid_piece = Piece(hex=new_Hex,
-                                                piece_name=self.piece_name,
-                                                piece_type=self.piece_type
-                                                )
-                                legal_pieces.append(valid_piece)   
+                                legal_moves.append(new_Hex)    
         else: # Not placed
             # if board is at initial state (black_pieces_placed == white_pieces_placed == 0):
             if(board.is_first_move == False):
-                # return (0,0,0)
-                valid_piece = Piece(hex=Hex(0,0),
-                                            piece_name=self.piece_name,
-                                            piece_type=self.piece_type
-                                            )
-                legal_pieces.append(valid_piece)
+                # return (0,0,0)     
+                legal_moves.append(Hex(0,0))  
             # else if board has one play (ex: currentpiece is white , there is 1 black_pieces_placed && 0 white_pieces_placed)
             elif(self.__hasOnePlay(board)): 
                 # loop over iterative moves and push all
                 for move in ITERATIVE_MOVES:
                     new_Hex = Hex(board.board[0].hex.q + move[0],board.board[0].hex.r + move[1])
-                    valid_piece = Piece(hex=new_Hex,
-                                            piece_name=self.piece_name,
-                                            piece_type=self.piece_type
-                                            )
-                    legal_pieces.append(valid_piece)
+                    legal_moves.append(new_Hex)
+
             else:   # in middle of game
                 # for each piece in board:
                 for piece in board.board:
@@ -145,7 +131,7 @@ class Beetles(Piece):
                                 for x in ITERATIVE_MOVES:
                                     valid = 0
                             #       if any has a piece with pieceColor not same as beetle :
-                                    new_Hex = Hex(new_Hex.q + x[0],new_Hex.r + x[1])
+                                    hexadjacent = Hex(new_Hex.q + x[0],new_Hex.r + x[1])
                             #                 
                                     for piece in board.board:
                                         # get piece with same hex 
@@ -153,15 +139,11 @@ class Beetles(Piece):
                                             valid = 1
                                     if (valid):
                                         #  push newhex to my_moves
-                                        valid_piece = Piece(hex=new_Hex,
-                                            piece_name=self.piece_name,
-                                            piece_type=self.piece_type
-                                            )
-                                        legal_pieces.append(valid_piece)
+                                        legal_moves.append(new_Hex)
       
         # unique_pieces = list(set(legal_pieces)) # to remove duplicates
-        unique_pieces = list({(p.hex.q, p.hex.r): p for p in legal_pieces}.values())
-        return unique_pieces    
+        unique_moves = list({(p.hex.q, p.hex.r): p for p in legal_moves}.values())
+        return unique_moves    
     
 
 
@@ -193,3 +175,10 @@ class Beetles(Piece):
             if(piece.hex == new_Hex ): # not sure about syntax
                 return True
         return False                
+    
+    def __isPieceFoundAndNotSame(self, board:Board,new_Hex:Hex):
+        for piece in board.board:
+            # get piece with same hex 
+            if(piece.hex == new_Hex and self is piece ): # not sure about syntax
+                return True
+        return False       
