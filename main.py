@@ -70,6 +70,7 @@ if __name__ == "__main__":
     main()
 
 # TODO
+# State diagram
 # Draw suggested moves using draw_hex
 # Add an outline to make hexas look nicer
 # Implement sliding algorithm

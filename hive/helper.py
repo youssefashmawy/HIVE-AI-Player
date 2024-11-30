@@ -9,6 +9,7 @@ from .constants import (
     LAYOUT,
     WIN,
     BLUE,
+    GREY,
     black_ant,
     black_spider,
     black_queen,
@@ -116,16 +117,23 @@ def draw_pieces(board: Board):
         "white_beetle": white_beetle,
     }
 
+    scaling_factor = 0.8  # Adjust this value to control the spacing
+
     for piece in board.board:
         position = hex_to_pixel(LAYOUT, piece.hex)
         image = piece_images.get(f"{piece.piece_type}_{piece.piece_name}")
         if image:
+            # Scale the image
             piece_width, piece_height = image.get_size()
+            scaled_width = int(piece_width * scaling_factor * 1.15)
+            scaled_height = int(piece_height * scaling_factor)
+            scaled_image = pygame.transform.scale(image, (scaled_width, scaled_height))
+            # Draw the scaled image centered on the hex
             WIN.blit(
-                image,
+                scaled_image,
                 (
-                    position.x - piece_width // 2,
-                    position.y - piece_height // 2,
+                    position.x - scaled_width // 2,
+                    position.y - scaled_height // 2,
                 ),
             )
 
@@ -158,3 +166,7 @@ def setup_board(board: Board):
     for position, name in zip(white_positions, white_piece_names):
         piece = Piece(position, name, "white")
         board.board.append(piece)
+
+    def draw_suggested_moves(moves: list[hex]) -> None:
+        for move in moves:
+            draw_hex(move, GREY)
