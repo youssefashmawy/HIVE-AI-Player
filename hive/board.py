@@ -12,10 +12,10 @@ class Board:
         self.selected_piece = selected_piece
         self.black_pieces_moved = 0
         self.white_pieces_moved = 0
+        self.unplaced_pieces = {}  # Unplaced pieces with counts
         self.difficulty = difficulty
         # To force first move in game to be in position 0,0,0
         self.is_first_move = True
-        self.game_array = []
 
     def set_selected_piece(self, selected_piece: Hex) -> None:
         self.selected_piece = selected_piece
@@ -25,7 +25,7 @@ class Board:
         self.board.insert(0, piece)
 
     def __repr__(self):
-        return f"Board = {self.board}\n\ngame_array = {self.game_array}"
+        return f"Board = {self.board}\n\nboard = {self.board}, unplaced Pieces ={self.unplaced_pieces}"
 
     def remove_piece_by_hex(self, hex: Hex) -> Piece | None:
         """removes a piece from the board and returns it
@@ -56,8 +56,8 @@ class Board:
 
     def not_break_hive(self, piece: Piece) -> bool:
         # 1) Copy the game state without the piece you are inspecting
-        copy_game_array = set(self.game_array)
-        copy_game_array.discard(piece)  # Remove the piece from the copy
+        copy_board = set(self.board)
+        copy_board.discard(piece)  # Remove the piece from the copy
 
         # 2) Get the neighbors of this piece (before removing it of course)
         neighbours = self.get_neighbours(piece)
@@ -77,13 +77,13 @@ class Board:
             adj_hexes = current_piece.generate_adj_hexs().values()
             adj_pieces = [
                 piece
-                for piece in copy_game_array
+                for piece in copy_board
                 if piece.hex in adj_hexes and piece not in visited
             ]
             queue.extend(adj_pieces)
 
-        # 4) Ensure all pieces in the copy_game_array are visited
-        all_pieces_connected = visited == copy_game_array
+        # 4) Ensure all pieces in the copy_board are visited
+        all_pieces_connected = visited == copy_board
 
         # 5) Check if all neighbors are in the visited nodes
         neighbors_in_visited = all(neighbor in visited for neighbor in neighbours)
@@ -102,7 +102,7 @@ class Board:
         """
         adj_hexes = piece.generate_adj_hexs().values()
         neighbours = []
-        for piece in self.game_array:
+        for piece in self.board:
             if piece.hex in adj_hexes:
                 neighbours.append(piece)
         return neighbours
@@ -114,7 +114,7 @@ class Board:
                 piece.hex = to_hex
                 self.is_first_move = False
                 if piece.is_placed == False:
-                    self.game_array.append(piece)
+                    self.board.append(piece)
                 piece.is_placed = True
 
                 if piece.piece_type == "black":

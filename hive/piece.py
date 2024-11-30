@@ -3,7 +3,7 @@ from abc import abstractmethod
 
 
 class Piece(Hex):
-    def __init__(self, hex: Hex, piece_name: str, piece_type: str):
+    def __init__(self, hex: Hex, piece_name: str, piece_type: str, count: int = 1):
         self.hex = hex
         assert piece_type.lower() in ["black", "white"]
         self.piece_name = piece_name.lower()

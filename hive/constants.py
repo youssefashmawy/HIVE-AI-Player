@@ -14,7 +14,7 @@ BLACK = (0, 0, 0)
 BLUE = (0, 0, 255)
 WHITE = (255, 255, 255)
 GREY = (128, 128, 128)
-
+CYAN = (0, 255, 255)
 
 FPS = 10
 PIECES_SCALING = (63, 63)
