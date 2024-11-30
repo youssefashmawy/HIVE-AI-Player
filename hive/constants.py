@@ -1,5 +1,5 @@
 import pygame
-from .orientation import Orientation
+from hive.orientation import Orientation
 from math import sqrt
 from hive.layout import Layout
 from hive.point import Point

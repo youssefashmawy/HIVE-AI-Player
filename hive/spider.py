@@ -3,7 +3,6 @@ from .board import Board
 from .hex import Hex
 class Spider(Piece):
     count = 2
-
     def __init__(self, hex: Hex, piece_name: str, piece_type: str, difficulty: int):
         super().__init__(hex, piece_name, piece_type)
         self.difficulty = difficulty
@@ -11,46 +10,81 @@ class Spider(Piece):
     def __repr__(self):
         return f"Spider {self.piece_name.capitalize()} at {self.hex} with difficulty {self.difficulty}"
 
-    def get_legal_moves_piece(self, board: Board) -> list[Piece]:
+    def get_legal_moves_piece(self, board: Board) -> list[Hex]:
 
         legal_moves = []
-        directions = self.get_directions() 
+        visited=set()
+        path=[]
         
-        # Spider moves 3 spaces in a straight line, so we check 3 times in each direction
-        for direction in directions:
-            temp_hex = self.hex
-            valid_move = True
-            # Try to move 3 steps in the chosen direction
-            for _ in range(3):
-                temp_hex = self.add_direction(temp_hex, direction)  # Get the new hex after move
-                
-                # Check if the new hex is valid (e.g., no occupied space or out of bounds)
-                if not board.is_valid_move(self, temp_hex):
-                    valid_move = False
-                    break
+        def dfs(current_hex:Hex, step:int):
+            if step==3:
+                if current_hex not in path and current_hex not in  visited:
+                 legal_moves.append(current_hex)
+                return
             
-            # If the move is valid, add it to the legal moves list
-            if valid_move:
-                legal_moves.append(Piece(temp_hex, self.piece_name, self.piece_type))
-        
-        return legal_moves
+            neighbors=self.get_neighbors(current_hex,board)
+            for neighbor in neighbors:
+                if neighbor not in visited and neighbor not in path and self.surrounded_neighbors(neighbor,board):
+                    visited.add(neighbor)
+                    path.append(neighbor)
+                    dfs(neighbor,step+1)
+                    path.pop()
+                    
+        dfs(self.hex,0)
+        return legal_moves    
+                
+                
+    def get_neighbors(hex: Hex, board: Board) -> list[Hex]:
 
-    def get_directions(self) -> list[tuple[int, int]]:
-        """
-        This method returns the 6 possible movement directions on a hexagonal grid.
-        These directions are typically represented as (q, r) axial coordinates in the hexagonal grid.
-        """
-        return [
-            (1, 0),  # Right
-            (1, -1),  # Top-Right
-            (0, -1),  # Top
-            (-1, 0),  # Left
-            (-1, 1),  # Bottom-Left
-            (0, 1)  # Bottom
-        ]
+  
+     directions = [
+        (1, 0),   # Right
+        (1, -1),  # Top-right
+        (0, -1),  # Top-left
+        (-1, 0),  # Left
+        (-1, 1),  # Bottom-left
+        (0, 1)    # Bottom-right
+      ]
     
-    def add_direction(self, hex: Hex, direction: tuple[int, int]) -> Hex:
-        """
-        Adds a direction to a given hex, which effectively moves the piece to the next hex in the grid.
-        """
-        return Hex(hex.q + direction[0], hex.r + direction[1])
+     neighbors = []
+
+     for direction in directions:
+           neighbor_hex = Hex(hex.q + direction[0], hex.r + direction[1], hex.s + (-direction[0] - direction[1]))
+        
+        
+     if not any(piece.hex.q == neighbor_hex.q and piece.hex.r == neighbor_hex.r and piece.hex.s == neighbor_hex.s for piece in board.board):
+            neighbors.append(neighbor_hex)
+     return neighbors
+    
+    def surrounded_neighbors(hex:Hex, board:Board)->bool:
+     directions = [
+        (1, 0),   # Right
+        (1, -1),  # Top-right
+        (0, -1),  # Top-left
+        (-1, 0),  # Left
+        (-1, 1),  # Bottom-left
+        (0, 1)    # Bottom-right
+      ]
+     for direction in directions:
+          neighbor_hex = Hex(hex.q + direction[0], hex.r + direction[1], hex.s + (-direction[0] - direction[1]))
+          if any(piece.hex.q == neighbor_hex.q and piece.hex.r == neighbor_hex.r and piece.hex.s == neighbor_hex.s for piece in board.board):
+              
+            return True
+        
+     return False
+        
+    
+    
+     
+        
+        
+                
+        
+            
+            
+            
+            
+        
+        
+        
+        

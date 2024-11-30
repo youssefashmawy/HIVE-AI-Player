@@ -1,4 +1,4 @@
-from .layout import Layout
+from hive.layout import Layout
 from .point import Point
 from .hex import Hex
 from math import pi, cos, sin
