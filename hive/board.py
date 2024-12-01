@@ -141,3 +141,22 @@ class Board:
 
     def total_moves(self) -> int:
         return self.black_pieces_moved + self.white_pieces_moved
+
+    def piece_exists(self, hex: Hex):
+        for piece in self.board:
+            if piece.hex.q == hex.q and piece.hex.r == hex.r and piece.hex.s == hex.s:
+                return True
+        return False
+    
+    def get_legal_placements(self, piece_type:str):
+        placements = []
+        for piece in self.board:
+            if piece.piece_type == piece_type:
+                placements += piece.generate_adj_hexs().values()
+                placements = [i for i in placements if not self.piece_exists(i)]
+                placements = list(set(placements))
+        for piece in self.board:
+            if piece.piece_type != piece_type:
+                placements = [i for i in placements if i not in piece.generate_adj_hexs().values()]
+        return placements
+    
