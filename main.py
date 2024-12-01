@@ -52,7 +52,7 @@ def main():
                             print(f"Selected placed piece at {selected_piece.hex}")
 
                     # This is where we draw our suggested moves
-                    draw_suggested_moves([Hex(q=0, r=0)])
+                    draw_suggested_moves([Hex(q=1, r=1)])
                 else:
                     # A piece is already selected
                     target_hex = hex_clicked  # The hex where the user clicked

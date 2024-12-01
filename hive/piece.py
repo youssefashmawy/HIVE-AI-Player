@@ -32,5 +32,14 @@ class Piece(Hex):
         return hash(self.hex)
 
     @abstractmethod
-    def get_legal_moves() -> list["Piece"]:
+    def get_legal_moves(self, board: list[list["Piece"]]) -> list["Piece"]:
+        """
+        Abstract method to calculate legal moves.
+
+        Args:
+            board (List[List[Piece]]): A list of stacks (each stack is a list of Pieces).
+
+        Returns:
+            List[Piece]: A list of legal moves represented by Pieces.
+        """
         pass

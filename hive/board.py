@@ -1,5 +1,6 @@
 from .hex import Hex
 from .piece import Piece
+from collections import defaultdict
 
 
 class Board:
@@ -25,7 +26,7 @@ class Board:
         self.board.insert(0, piece)
 
     def __repr__(self):
-        return f"Board = {self.board}\n\nboard = {self.board}, unplaced Pieces ={self.unplaced_pieces}"
+        return f"\n\nBoard = {self.board}\n\nboard = {self.board}, unplaced Pieces ={self.unplaced_pieces}"
 
     def remove_piece_by_hex(self, hex: Hex) -> Piece | None:
         """removes a piece from the board and returns it
