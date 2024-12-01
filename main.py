@@ -111,9 +111,11 @@ if __name__ == "__main__":
 
 # TODO
 # State diagram
-# Draw suggested moves using draw_hex
+# Draw suggested moves using draw_hex(Pieces inside the board) --> DONE
+# Draw suggested placements using draw_hex(Pieces outside the board)
 # Implement sliding algorithm
-# Implement not pinned
+# Implement not pinned(Beetle)
 # Implement immbolized
 # Implement AI vs player
 # Implement AI vs AI
+# Probably will make board list of stacks to take beetle into consideration
