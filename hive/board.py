@@ -17,6 +17,7 @@ class Board:
         self.difficulty = difficulty
         # To force first move in game to be in position 0,0,0
         self.is_first_move = True
+        self.is_second_move = True
 
     def set_selected_piece(self, selected_piece: Hex) -> None:
         self.selected_piece = selected_piece
