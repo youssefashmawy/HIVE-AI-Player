@@ -9,6 +9,9 @@ from .constants import (
     LAYOUT,
     WIN,
     BLUE,
+    GREY,
+    BLACK,
+    CYAN,
     black_ant,
     black_spider,
     black_queen,
@@ -116,45 +119,106 @@ def draw_pieces(board: Board):
         "white_beetle": white_beetle,
     }
 
+    scaling_factor = 0.8
+    scale_width = 1.15
+    font = pygame.font.SysFont(None, 24)
+
+    # Draw unplaced pieces (stacks) with counts
+    for key, data in board.unplaced_pieces.items():
+        position = hex_to_pixel(LAYOUT, data["position"])
+        image = piece_images.get(key)
+        if image:
+            # Scale the image
+            piece_width, piece_height = image.get_size()
+            scaled_width = int(piece_width * scaling_factor * scale_width)
+            scaled_height = int(piece_height * scaling_factor)
+            scaled_image = pygame.transform.scale(image, (scaled_width, scaled_height))
+
+            # Draw the image centered on the hex
+            WIN.blit(
+                scaled_image,
+                (
+                    position.x - scaled_width // 2,
+                    position.y - scaled_height // 2,
+                ),
+            )
+
+            # Render and draw the count next to the piece
+            count_text = font.render(str(data["count"]), True, BLACK)
+            WIN.blit(
+                count_text,
+                (
+                    position.x + scaled_width // 2 - count_text.get_width() // 2,
+                    position.y - scaled_height // 2 - count_text.get_height(),
+                ),
+            )
+
+    # Draw placed pieces without counts
     for piece in board.board:
         position = hex_to_pixel(LAYOUT, piece.hex)
-        image = piece_images.get(f"{piece.piece_type}_{piece.piece_name}")
+        image_key = f"{piece.piece_type}_{piece.piece_name}"
+        image = piece_images.get(image_key)
         if image:
+            # Scale the image
             piece_width, piece_height = image.get_size()
+            scaled_width = int(piece_width * scaling_factor * scale_width)
+            scaled_height = int(piece_height * scaling_factor)
+            scaled_image = pygame.transform.scale(image, (scaled_width, scaled_height))
+
+            # Draw the image centered on the hex
             WIN.blit(
-                image,
+                scaled_image,
                 (
-                    position.x - piece_width // 2,
-                    position.y - piece_height // 2,
+                    position.x - scaled_width // 2,
+                    position.y - scaled_height // 2,
                 ),
             )
 
 
 def setup_board(board: Board):
-    # Place black pieces on the left
-    black_positions = [
-        Hex(-8, -2),
-        Hex(-8, 0),
-        Hex(-8, 2),
-        Hex(-8, 4),
-        Hex(-8, 6),
-    ]
-    black_piece_names = ["ant", "spider", "queen", "grasshopper", "beetle"]
+    piece_counts = {
+        "ant": 3,
+        "beetle": 2,
+        "queen": 1,
+        "grasshopper": 3,
+        "spider": 2,
+    }
 
-    for position, name in zip(black_positions, black_piece_names):
-        piece = Piece(position, name, "black")
-        board.board.append(piece)
+    # Positions for black piece stacks
+    black_positions = {
+        "ant": Hex(-8, -2),
+        "beetle": Hex(-8, 0),
+        "queen": Hex(-8, 2),
+        "grasshopper": Hex(-8, 4),
+        "spider": Hex(-8, 6),
+    }
 
-    # Place white pieces on the right
-    white_positions = [
-        Hex(8, -10),
-        Hex(8, -8),
-        Hex(8, -6),
-        Hex(8, -4),
-        Hex(8, -2),
-    ]
-    white_piece_names = ["ant", "spider", "queen", "grasshopper", "beetle"]
+    # Initialize unplaced black pieces
+    for name, count in piece_counts.items():
+        position = black_positions[name]
+        board.unplaced_pieces[f"black_{name}"] = {
+            "position": position,
+            "count": count,
+        }
 
-    for position, name in zip(white_positions, white_piece_names):
-        piece = Piece(position, name, "white")
-        board.board.append(piece)
+    # Positions for white piece stacks
+    white_positions = {
+        "ant": Hex(8, -10),
+        "beetle": Hex(8, -8),
+        "queen": Hex(8, -6),
+        "grasshopper": Hex(8, -4),
+        "spider": Hex(8, -2),
+    }
+
+    # Initialize unplaced white pieces
+    for name, count in piece_counts.items():
+        position = white_positions[name]
+        board.unplaced_pieces[f"white_{name}"] = {
+            "position": position,
+            "count": count,
+        }
+
+
+def draw_suggested_moves(moves: list[hex]) -> None:
+    for move in moves:
+        draw_hex(move, CYAN)
