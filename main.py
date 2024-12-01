@@ -42,6 +42,8 @@ def main():
                     for key, data in board.unplaced_pieces.items():
                         if data["position"] == hex_clicked and data["count"] > 0:
                             selected_piece_key = key
+                            if not board.is_first_move: 
+                                draw_suggested_moves(board.get_legal_placements(str(key).split('_')[0]))
                             print(f"Selected unplaced piece: {selected_piece_key}")
                             break
                     else:
@@ -52,11 +54,11 @@ def main():
                             print(f"Selected placed piece at {selected_piece.hex}")
 
                     # This is where we draw our suggested moves
-                    draw_suggested_moves([Hex(q=1, r=1)])
+                    if board.is_first_move: draw_suggested_moves([Hex(q=1, r=1)])
                 else:
                     # A piece is already selected
                     target_hex = hex_clicked  # The hex where the user clicked
-
+                    board.is_first_move = False
                     if selected_piece_key:
                         # Attempt to place the unplaced piece on the board
                         piece_type, piece_name = selected_piece_key.split("_")
