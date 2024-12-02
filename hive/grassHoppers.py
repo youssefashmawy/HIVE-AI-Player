@@ -20,15 +20,39 @@ class GrassHopper(Piece):
         super().__init__(hex, "grasshopper", piece_type)
         self.difficulty = difficulty
 
-    def get_legal_moves_piece(self, board: list[list[Piece]]) -> list[Hex]:
+    def get_legal_moves_piece(self, board: list[list["Piece"]]) -> list["Hex"]:
         """
         Calculate valid moves for a Grasshopper in the Hive game.
 
         Rules for Grasshopper movement:
-        1. Can only move in a straight line (like a rook in chess)
-        2. Must jump over at least one piece
-        3. Land on the first empty space after jumping
-        4. Cannot jump over empty spaces
+
+        The Grasshopper does not move around the outside of the Hive like the other creatures. Instead, it jumps from its space over any number of pieces (but at least one) to the next unoccupied space along a straight row of joined pieces.
+
         """
 
         legal_moves = []
+
+        # get all ocuppied places on board
+        occupied_places = {piece.hex for stack in board for piece in stack if piece}
+
+        for m in MOVES:
+
+            current_hex = Hex(self.hex.q + m.q, self.hex.r + m.r)
+
+            jumped_over = 0
+
+            # jump till find a sitable place
+            while current_hex in occupied_places:
+                jumped_over += 1
+                current_hex = Hex(current_hex.q + m.q, current_hex.r + m.r)
+
+            # Valid move if jumped at least one piece and landed on empty hex
+            if jumped_over > 0 and current_hex not in occupied_places:
+                legal_moves.append(current_hex)
+
+        return legal_moves
+
+    def move(self, destination: Hex):
+
+        self.hex = destination
+        self.is_placed = True
