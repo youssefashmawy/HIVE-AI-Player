@@ -20,7 +20,7 @@ class GrassHopper(Piece):
         super().__init__(hex, "grasshopper", piece_type)
         self.difficulty = difficulty
 
-    def get_legal_moves_piece(self, board: Board):
+    def get_legal_moves_piece(self, board: list[list[Piece]]) -> list[Hex]:
         """
         Calculate valid moves for a Grasshopper in the Hive game.
 
