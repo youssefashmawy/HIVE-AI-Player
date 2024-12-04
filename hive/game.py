@@ -352,7 +352,7 @@ class HiveGame:
                     item.count -= 1
                 else:
                     raise ValueError(
-                        f"AI attempted to place a piece of type '{best_move["piece"]}', but it's unavailable in the inventory."
+                        f"AI attempted to place a piece of type '{best_move['piece']}', but it's unavailable in the inventory."
                     )
             return True
         else:
