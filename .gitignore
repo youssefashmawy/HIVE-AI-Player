@@ -177,3 +177,4 @@ cython_debug/
 # Ignore pdfs
 *.pdf
 ProjectDescription.pdf
+git_log_output.txt
