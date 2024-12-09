@@ -32,7 +32,7 @@ class HiveBoard:
         }
 
         # Drawing parameters
-        self.scaling_factor = 0.8
+        self.scaling_factor = 0.75
         self.scale_width = 1.15
 
     def hex_to_pixel(self, h: Hex) -> Point:

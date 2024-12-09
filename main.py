@@ -1,5 +1,7 @@
 import pygame
 import sys
+import random
+
 
 from hive.ui.menu import HiveMenu
 from hive.ui.gameover import HiveGameOver
@@ -42,6 +44,7 @@ def main():
 if __name__ == "__main__":
     # profiler = cProfile.Profile()
     # profiler.enable()
+    random.seed(10) # set random seed
     main()
     # profiler.disable()
     # stats = pstats.Stats(profiler)

@@ -1,7 +1,6 @@
-import concurrent.futures
-import math
+from typing import Literal
 from typing import List, Optional, Dict, Any
-from copy import deepcopy
+import random
 from hive.piece import Ant, Beetle, Queen, Hopper, Spider, Piece
 from hive.board import Board
 from hive.hex import Hex
@@ -131,7 +130,7 @@ class Node:
 
 
 class HiveMinMaxAI:
-    def __init__(self, role: str, max_depth: int):
+    def __init__(self, role: str, difficulty: Literal["easy", "medium", "hard"]):
         """
         Initialize the MinMax AI for Hive
 
@@ -139,7 +138,10 @@ class HiveMinMaxAI:
         :param max_depth: Maximum search depth for the algorithm
         """
         self.role = role
-        self.max_depth = max_depth
+        difficulty = difficulty.lower()
+        self.difficulty = difficulty
+        self.max_depth = 1 if difficulty == "easy" else 2 
+
 
     def choose_best_move(
         self,
@@ -300,32 +302,36 @@ class HiveMinMaxAI:
         opponent_role = "black" if role == "white" else "white"
 
         # Piece type mobility weights (higher means more strategic importance)
-        mobility_weights = {
-            "Ant": 4,  # Highly mobile
-            "Spider": 3,  # Strategic movement
-            "Beetle": 2,  # Can climb and block
-            "Hopper": 1,  # Limited mobility
-        }
+        if self.difficulty == "hard":
+            mobility_weights = {
+                "Ant": 4,  # Highly mobile
+                "Spider": 3,  # Strategic movement
+                "Beetle": 2,  # Can climb and block
+                "Hopper": 1,  # Limited mobility
+            }
+            # 1. Piece Mobility Heuristics
+            role_mobility = self._calculate_piece_mobility(board, role, mobility_weights)
+            opponent_mobility = self._calculate_piece_mobility(
+                board, opponent_role, mobility_weights
+            )
 
-        # 1. Piece Mobility Heuristics
-        role_mobility = self._calculate_piece_mobility(board, role, mobility_weights)
-        opponent_mobility = self._calculate_piece_mobility(
-            board, opponent_role, mobility_weights
-        )
+            score += role_mobility - opponent_mobility
 
-        score += role_mobility - opponent_mobility
+        if self.difficulty == "medium" or self.difficulty == "hard":
+            # 2. Queen Bee Safety Heuristic
+            role_queen_safety = self._evaluate_queen_safety(board, role)
+            opponent_queen_safety = self._evaluate_queen_safety(board, opponent_role)
 
-        # 2. Queen Bee Safety Heuristic
-        role_queen_safety = self._evaluate_queen_safety(board, role)
-        opponent_queen_safety = self._evaluate_queen_safety(board, opponent_role)
-
-        score += (role_queen_safety - opponent_queen_safety) * 3
+            score += (role_queen_safety - opponent_queen_safety) * 3
 
         # 4. Endgame Detection (Massive score adjustment)
         if board.is_endgame(role):
-            score += 1000  # Winning condition
+            score += float("inf")  # Winning condition
         elif board.is_endgame(opponent_role):
-            score -= 1000  # Losing condition
+            score -= float("inf")  # Losing condition
+
+        # add random noise between -10 and 0 for ai vs ai
+        score += random.randint(-10, 0)
 
         return score
 
@@ -334,7 +340,7 @@ class HiveMinMaxAI:
         Calculate mobility score for each piece type for a given role
         """
         total_mobility = 0
-        piece_types = ["Ant", "Spider", "Hopper"]
+        piece_types = ["Ant", "Spider", "Hopper","Beetle"]
 
         for piece_type in piece_types:
             # Find all pieces of this type for the given role

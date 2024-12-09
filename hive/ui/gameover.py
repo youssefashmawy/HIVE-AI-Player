@@ -29,7 +29,7 @@ class HiveGameOver:
         self.screen.blit(text_surface, text_rect)
 
         # Prompt for the next action
-        prompt_text = "Press 'Q' to Quit or 'M' to Return to the Menu"
+        prompt_text = "Press 'Q': Quit, 'M': Menu"
         prompt_text_surface = font.render(prompt_text, True, Consts.BLACK)
         prompt_text_rect = prompt_text_surface.get_rect(
             center=(self.screen.get_width() // 2, self.screen.get_height() // 2 + 100)

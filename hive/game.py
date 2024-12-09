@@ -30,27 +30,23 @@ class HiveGame:
 
         mode = game_config.get("mode", "Player vs Player")
 
-        # Map difficulty to depth
-        difficulty_map = {"Easy": 1, "Medium": 2, "Hard": 3}
-
         # Configure AI players based on mode
         if mode == "AI vs Player":
             self.black_ai = HiveMinMaxAI(
                 role="black",
-                max_depth=difficulty_map[game_config.get("difficulty_1", "Medium")],
+                difficulty=game_config.get("difficulty_1", "medium"),
             )
         elif mode == "AI vs AI":
             self.white_ai = HiveMinMaxAI(
                 role="white",
-                max_depth=difficulty_map[game_config.get("difficulty_1", "Medium")],
+                difficulty=game_config.get("difficulty_1", "medium"),
             )
             self.black_ai = HiveMinMaxAI(
                 role="black",
-                max_depth=difficulty_map[game_config.get("difficulty_2", "Medium")],
+                difficulty=game_config.get("difficulty_2", "medium"),
             )
 
         # Game state variables
-        self.run = True
         self.clock = pygame.time.Clock()
 
         self.hive_board = HiveBoard()
@@ -78,6 +74,10 @@ class HiveGame:
 
         self.setup_inventories()
         self.turn = 1  # odd means white and even means black
+
+        # initialize skip_counter 
+        self.white_skip_counter = 0
+        self.black_skip_counter = 0
 
     def is_role_white(self):
         return self.turn % 2 == 1
@@ -254,6 +254,19 @@ class HiveGame:
             Consts.logo_image, (360, Consts.WIN.get_height() - Consts.INVENTORY_HEIGHT)
         )
         self.black_inventory.draw(Consts.WIN)  # Draw black inventory
+
+        # Draw role indicator
+        font = pygame.font.Font(None, 24)
+        role_text = font.render("Role:", True, (0, 0, 0))
+        role_text_rect = role_text.get_rect(topleft=(10, 10))
+        Consts.WIN.blit(role_text, role_text_rect)
+
+        # Draw colored circle to indicate current role
+        circle_color = (0, 0, 0) if self.get_type_from_turn() == "black" else (255, 255, 255)
+        circle_outline_color = (255, 255, 255) if self.get_type_from_turn() == "black" else (0, 0, 0)
+        pygame.draw.circle(Consts.WIN, circle_outline_color, (role_text_rect.right + 20, role_text_rect.centery), 12, 2)
+        pygame.draw.circle(Consts.WIN, circle_color, (role_text_rect.right + 20, role_text_rect.centery), 10)
+
         pygame.display.update()
 
     def run_game(self) -> Literal["white", "black", "draw"]:
@@ -263,11 +276,8 @@ class HiveGame:
         :return: Boolean indicating if the game should continue
         """
         # Reset game state
-        self.run = True
-        self.selected_piece = None
-        self.selected_piece_key = None
 
-        while self.run:
+        while True:
             end_game_result = self.end_game_result()
             if end_game_result:
                 return end_game_result
@@ -306,11 +316,11 @@ class HiveGame:
             # Control game speed
             self.clock.tick(Consts.FPS)
 
-        return False
 
     def end_game_result(self) -> Literal["white", "black", "draw", None]:
         white_win = self.board.is_endgame("black")  # white wins if black is gameover
         black_win = self.board.is_endgame("white")  # black wins if white is gameover
+        
         if white_win and black_win:
             return "draw"
         if white_win:
@@ -318,6 +328,11 @@ class HiveGame:
         if black_win:
             return "black"
 
+        if self.white_skip_counter >= 3:
+            return "black"
+        if self.black_skip_counter >= 3:
+            return "white"
+        
         return None
 
     def perform_ai_move(self, ai_player: HiveMinMaxAI):
@@ -357,8 +372,8 @@ class HiveGame:
             return True
         else:
             return False
-
-    def is_turn_skippable(self, turn: int) -> bool:
+    
+    def _is_turn_skippable_helper(self, turn: int) -> bool:
         """
         Check if the current player has no legal moves to make.
 
@@ -385,11 +400,29 @@ class HiveGame:
                     return False
 
         return True
+    
+    def is_turn_skippable(self, turn:int)->bool:
+        res=self._is_turn_skippable_helper(turn)
+        if res:
+            if self.is_role_white():
+                self.white_skip_counter +=1
+            else:
+                self.black_skip_counter +=1
+        else:
+            self.white_skip_counter = 0
+            self.black_skip_counter = 0
 
+        # return the actual result
+        return res
+       
     def display_skip_screen(self):
         """
         Display a screen asking the player to confirm skipping their turn.
         """
+        if self.is_role_white():
+            self.white_skip_counter += 1
+        else:
+            self.black_skip_counter += 1
         # Create a semi-transparent overlay
         overlay = pygame.Surface(Consts.WIN.get_size(), pygame.SRCALPHA)
         overlay.fill((0, 0, 0, 128))  # Semi-transparent black
