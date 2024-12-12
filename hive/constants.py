@@ -3,6 +3,7 @@ from .orientation import Orientation
 from math import sqrt
 from hive.layout import Layout
 from hive.point import Point
+from .helper import resource_path
 
 
 class Consts:
@@ -22,40 +23,40 @@ class Consts:
     PIECES_SCALING = (63, 63)
 
     # Images
-    background_image = pygame.image.load("Assets/board_background.jpg")
+    background_image = pygame.image.load(resource_path("Assets/board_background.jpg"))
 
     # Black pieces
     black_ant = pygame.transform.scale(
-        pygame.image.load("Assets/black_ant.png"), PIECES_SCALING
+        pygame.image.load(resource_path("Assets/black_ant.png")), PIECES_SCALING
     )
     black_spider = pygame.transform.scale(
-        pygame.image.load("Assets/black_spider.png"), PIECES_SCALING
+        pygame.image.load(resource_path("Assets/black_spider.png")), PIECES_SCALING
     )
     black_queen = pygame.transform.scale(
-        pygame.image.load("Assets/black_queen.png"), PIECES_SCALING
+        pygame.image.load(resource_path("Assets/black_queen.png")), PIECES_SCALING
     )
     black_grasshopper = pygame.transform.scale(
-        pygame.image.load("Assets/black_grasshopper.png"), PIECES_SCALING
+        pygame.image.load(resource_path("Assets/black_grasshopper.png")), PIECES_SCALING
     )
     black_beetle = pygame.transform.scale(
-        pygame.image.load("Assets/black_beetle.png"), PIECES_SCALING
+        pygame.image.load(resource_path("Assets/black_beetle.png")), PIECES_SCALING
     )
 
     # White pieces
     white_ant = pygame.transform.scale(
-        pygame.image.load("Assets/white_ant.png"), PIECES_SCALING
+        pygame.image.load(resource_path("Assets/white_ant.png")), PIECES_SCALING
     )
     white_spider = pygame.transform.scale(
-        pygame.image.load("Assets/white_spider.png"), PIECES_SCALING
+        pygame.image.load(resource_path("Assets/white_spider.png")), PIECES_SCALING
     )
     white_queen = pygame.transform.scale(
-        pygame.image.load("Assets/white_queen.png"), PIECES_SCALING
+        pygame.image.load(resource_path("Assets/white_queen.png")), PIECES_SCALING
     )
     white_grasshopper = pygame.transform.scale(
-        pygame.image.load("Assets/white_grasshopper.png"), PIECES_SCALING
+        pygame.image.load(resource_path("Assets/white_grasshopper.png")), PIECES_SCALING
     )
     white_beetle = pygame.transform.scale(
-        pygame.image.load("Assets/white_beetle.png"), PIECES_SCALING
+        pygame.image.load(resource_path("Assets/white_beetle.png")), PIECES_SCALING
     )
 
     # Hexagon constants
@@ -84,5 +85,5 @@ class Consts:
 
     LOGO_SCALING = (INVENTORY_HEIGHT - 20, INVENTORY_HEIGHT - 20)
     logo_image = pygame.transform.scale(
-        pygame.image.load("./Assets/logo.png"), LOGO_SCALING
+        pygame.image.load(resource_path("./Assets/logo.png")), LOGO_SCALING
     )

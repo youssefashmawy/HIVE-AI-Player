@@ -1,6 +1,5 @@
 import pygame
-import sys
-
+from ..helper import resource_path
 
 class HiveMenu:
     def __init__(self, screen_width=800, screen_height=600):
@@ -22,7 +21,7 @@ class HiveMenu:
         self.font = pygame.font.Font(None, 48)
         self.small_font = pygame.font.Font(None, 36)
 
-        self.background = pygame.image.load("./Assets/board_background.jpg")
+        self.background = pygame.image.load(resource_path("./Assets/board_background.jpg"))
         self.background = pygame.transform.scale(
             self.background, (screen_width, screen_height)
         )
