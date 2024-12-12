@@ -121,14 +121,14 @@ class HiveGame:
                 Item("black", name, count, black_piece_images[name])
             )
 
-    def handle_events(self) -> bool:
+    def handle_events(self,events:list[pygame.event.Event]) -> bool:
         """
         Handle pygame events
 
         :return: Boolean indicating if there's a change in game state
         """
 
-        for event in pygame.event.get():
+        for event in events:
             if event.type == pygame.QUIT:
                 return False
 
@@ -278,7 +278,9 @@ class HiveGame:
         # Reset game state
 
         while True:
-            end_game_result = self.end_game_result()
+            events=pygame.event.get()
+
+            end_game_result = self.end_game_result(events)
             if end_game_result:
                 return end_game_result
 
@@ -303,7 +305,7 @@ class HiveGame:
                     self.turn += 1
             else:
                 # Handle human turn
-                turn_flipped = self.handle_events()
+                turn_flipped = self.handle_events(events)
                 if turn_flipped:
                     self.turn += 1
                     if self.black_ai is None and self.is_turn_skippable(self.turn):
@@ -317,7 +319,7 @@ class HiveGame:
             self.clock.tick(Consts.FPS)
 
 
-    def end_game_result(self) -> Literal["white", "black", "draw", None]:
+    def end_game_result(self,events:list[pygame.event.Event]) -> Literal["white", "black", "draw","exit", None]:
         white_win = self.board.is_endgame("black")  # white wins if black is gameover
         black_win = self.board.is_endgame("white")  # black wins if white is gameover
         
@@ -333,6 +335,11 @@ class HiveGame:
         if self.black_skip_counter >= 3:
             return "white"
         
+        for event in events:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_m:  # 'm' to get menu
+                    return "exit"  
+            
         return None
 
     def perform_ai_move(self, ai_player: HiveMinMaxAI):
