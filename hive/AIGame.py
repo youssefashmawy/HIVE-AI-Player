@@ -6,8 +6,8 @@ from hive.board import Board
 from hive.hex import Hex
 
 from hive.ui.inventory import Inventory, Item
-import threading
-from concurrent.futures import ThreadPoolExecutor, as_completed
+import cProfile
+import pstats
 
 class Node:
     def __init__(
@@ -89,7 +89,7 @@ class Node:
                             "No more pieces in inventory: " + from_inventory_piece_name
                         )
         else:
-            if self.board.hex_empty(from_hex):
+            if not self.board.hex_inside_board(from_hex) or self.board.hex_empty(from_hex):
                 raise Exception("No piece in the from hex")
 
             # Save state for undo
@@ -110,6 +110,10 @@ class Node:
             piece = self.board.remove_top_piece(to_location)
             if piece.piece_type != "white":
                 raise Exception("Piece in the to location is not white")
+            
+            if piece.piece_name == "Queen":
+                self.board.white_queen_location=None
+
             # update the inventory
             for item in self.white_inventory:
                 if item.name == piece.piece_name:
@@ -120,6 +124,9 @@ class Node:
 
             if piece.piece_type != "black":
                 raise Exception("Piece in the to location is not black")
+            
+            if piece.piece_name == "Queen":
+                self.board.black_queen_location=None
             # update the inventory
             for item in self.black_inventory:
                 if item.name == piece.piece_name:
@@ -162,6 +169,10 @@ class HiveMinMaxAI:
         :param black_inventory: Inventory of black pieces
         :return: Best move dictionary
         """
+        # profiler = cProfile.Profile()
+        # profiler.enable()
+        
+        
         undo_stack: list[tuple[str | Hex, Hex]] = []
         node = Node(board, white_inventory, black_inventory, turn)
 
@@ -194,7 +205,11 @@ class HiveMinMaxAI:
 
             if beta <= alpha:
                 break
-
+        
+        # profiler.disable()
+        # stats = pstats.Stats(profiler)
+        # stats.sort_stats("tottime")  # Sort by cumulative time
+        # stats.print_stats(100)  # Print top 20 time-consuming functions
         return best_move
 
     def _minmax(self, node: Node, depth, is_maximizing, alpha, beta, undo_stack):
@@ -338,7 +353,6 @@ class HiveMinMaxAI:
         # Get current turn-based weights
         current_weights = self._calculate_dynamic_weights(node.turn)
 
-
         pieces_mobility = self._calculate_pieces_mobility(board)
         # Calculate mobility score
         for (color, piece_type), mobility in pieces_mobility.items():
@@ -364,7 +378,7 @@ class HiveMinMaxAI:
                 score -= mobility * weight
 
         # add random noise between -10 and 0 for ai vs ai
-        score += random.randint(-10, 0)
+        score += random.randint(-20, 0)
 
         return score 
 
@@ -379,9 +393,6 @@ class HiveMinMaxAI:
             ("white", "Hopper"): 0,
             ("white", "Spider"): 0,
         }
-
-        # Lock for thread-safe updates to the shared dictionary
-        mobility_lock = threading.Lock()
         
         def calculate_piece_mobility(hex_key):
             """
@@ -405,19 +416,12 @@ class HiveMinMaxAI:
             
             return (mobility_key, possible_moves)
         
-        # Use ThreadPoolExecutor for concurrent processing
-        with ThreadPoolExecutor(max_workers=10) as executor:
-            # Submit tasks for each hex on the board
-            future_to_hex = {executor.submit(calculate_piece_mobility, hex_key): hex_key 
-                            for hex_key in board.board.keys()}
-            
-            # Process results
-            for future in as_completed(future_to_hex):
-                result = future.result()
-                if result is not None:
-                    mobility_key, moves = result
-                    with mobility_lock:
-                        pieces_mobility[mobility_key] += moves
+        for hex_key in board.board.keys():
+            res= calculate_piece_mobility(hex_key)
+            if res is None:
+                continue
+            mobility_key, moves = res
+            pieces_mobility[mobility_key] += moves
         
         return pieces_mobility
     
@@ -432,9 +436,6 @@ class HiveMinMaxAI:
             ("white", "Ant"): 0,
             ("white", "Beetle"): 0,
         }
-
-        # Lock for thread-safe updates to the shared dictionary
-        mobility_lock = threading.Lock()
         
         def calculate_piece_active_count(hex_key):
             """
@@ -457,19 +458,12 @@ class HiveMinMaxAI:
             
             return (active_key, 1 if is_active else 0)
         
-        # Use ThreadPoolExecutor for concurrent processing
-        with ThreadPoolExecutor(max_workers=10) as executor:
-            # Submit tasks for each hex on the board
-            future_to_hex = {executor.submit(calculate_piece_active_count, hex_key): hex_key 
-                            for hex_key in board.board.keys()}
-            
-            # Process results
-            for future in as_completed(future_to_hex):
-                result = future.result()
-                if result is not None:
-                    active_key, moves = result
-                    with mobility_lock:
-                        pieces_active[active_key] += moves
+        for hex_key in board.board.keys():
+            res= calculate_piece_active_count(hex_key)
+            if res is None:
+                continue
+            active_key, moves = res
+            pieces_active[active_key] += moves
         
         return pieces_active
     def _around_queen(self, board: Board, role):
@@ -483,7 +477,7 @@ class HiveMinMaxAI:
 
         # Check surrounding hexes
         adjacent_hexes = queen_location.generate_adj_hexs()
-        blocked_hexes = sum(1 for hex in adjacent_hexes if not board.hex_empty(hex))
+        blocked_hexes = sum(1 for hex in adjacent_hexes if not board.hex_inside_board(hex) or not board.hex_empty(hex))
 
         # The more blocked hexes around the queen, the worse the safety
         return blocked_hexes

@@ -2,24 +2,21 @@ from .hex import Hex
 from abc import abstractmethod
 from hive.constants import Consts
 from pygame.surface import Surface
-
+from typing import Literal
 
 class Piece:
-    def __init__(self, piece_name: str, piece_type: str):
+    def __init__(self, piece_name: Literal["Queen","Ant","Hopper","Spider","Beetle"], piece_type: Literal["black","white"]):
         assert piece_type.lower() in ["black", "white"]
-        self.piece_name = piece_name.capitalize()
-        self.piece_type = piece_type.lower()
+        self.piece_name: Literal["Queen","Ant","Hopper","Spider","Beetle"] = piece_name.capitalize()
+        self.piece_type: Literal["black","white"] = piece_type.lower()
 
     def __repr__(self) -> str:
-        return f"{self.piece_type.capitalize()} {self.piece_name.capitalize()} at {self.hex} was placed:{self.is_placed}"
+        return f"{self.piece_type.capitalize()} {self.piece_name.capitalize()}"
 
     def __eq__(self, other: "Piece"):
         return (self.piece_name) == (other.piece_name) and (self.piece_type) == (
             other.piece_type
         )
-
-    def __hash__(self):
-        return hash(self.hex)
 
     def get_image(self) -> Surface:
         return ""

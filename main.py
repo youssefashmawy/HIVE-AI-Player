@@ -5,8 +5,7 @@ import random
 from hive.ui.menu import HiveMenu
 from hive.ui.gameover import HiveGameOver
 from hive.game import HiveGame
-# import cProfile
-# import pstats
+
 
 
 def main():
