@@ -1,6 +1,4 @@
 import pygame
-import sys
-from typing import Optional, Tuple
 from typing import Literal
 
 from hive.constants import Consts

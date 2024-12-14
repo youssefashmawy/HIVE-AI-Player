@@ -178,3 +178,7 @@ cython_debug/
 *.pdf
 ProjectDescription.pdf
 git_log_output.txt
+
+dist
+Hive.spec
+build
