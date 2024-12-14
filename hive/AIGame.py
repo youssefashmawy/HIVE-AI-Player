@@ -340,9 +340,20 @@ class HiveMinMaxAI:
 
 
         pieces_mobility = self._calculate_pieces_mobility(board)
-
         # Calculate mobility score
         for (color, piece_type), mobility in pieces_mobility.items():
+            # Apply weight based on the piece type
+            weight = current_weights.get(piece_type, 1)
+            
+            # Adjust score based on mobility and color
+            if color == role:
+                score += mobility * weight
+            else:
+                score -= mobility * weight
+
+        pieces_active = self._calculate_pieces_active_count(board)
+        # Calculate mobility score
+        for (color, piece_type), mobility in pieces_active.items():
             # Apply weight based on the piece type
             weight = current_weights.get(piece_type, 1)
             
@@ -363,12 +374,12 @@ class HiveMinMaxAI:
         """
         # Initialize pieces_mobility dictionary
         pieces_mobility = {
-            ("black", "Ant"): 0,
             ("black", "Hopper"): 0,
-            ("white", "Ant"): 0,
+            ("black", "Spider"): 0,
             ("white", "Hopper"): 0,
+            ("white", "Spider"): 0,
         }
-        
+
         # Lock for thread-safe updates to the shared dictionary
         mobility_lock = threading.Lock()
         
@@ -395,7 +406,7 @@ class HiveMinMaxAI:
             return (mobility_key, possible_moves)
         
         # Use ThreadPoolExecutor for concurrent processing
-        with ThreadPoolExecutor(max_workers=4) as executor:
+        with ThreadPoolExecutor(max_workers=10) as executor:
             # Submit tasks for each hex on the board
             future_to_hex = {executor.submit(calculate_piece_mobility, hex_key): hex_key 
                             for hex_key in board.board.keys()}
@@ -409,34 +420,58 @@ class HiveMinMaxAI:
                         pieces_mobility[mobility_key] += moves
         
         return pieces_mobility
+    
+    def _calculate_pieces_active_count(self, board: Board):
+        """
+        Calculate the mobility score for each piece type for a given role using threading
+        """
+        # Initialize pieces_mobility dictionary
+        pieces_active = {
+            ("black", "Ant"): 0,
+            ("black", "Beetle"): 0,
+            ("white", "Ant"): 0,
+            ("white", "Beetle"): 0,
+        }
+
+        # Lock for thread-safe updates to the shared dictionary
+        mobility_lock = threading.Lock()
         
-    def _calculate_piece_mobility(self, board: Board, role, mobility_weights):
-        """
-        Calculate mobility score for each piece type for a given role
-        """
-        total_mobility = 0
-        piece_types = ["Ant", "Spider", "Hopper","Beetle"]
-
-        for piece_type in piece_types:
-            # Find all pieces of this type for the given role
-            type_pieces = [
-                hex
-                for hex, pieces in board.board.items()
-                if pieces
-                and pieces[-1].piece_type == role
-                and pieces[-1].piece_name == piece_type
-            ]
-
-            # Calculate mobility for each piece
-            type_mobility = sum(
-                len(board.possible_moves(hex, role)) * mobility_weights[piece_type]
-                for hex in type_pieces
-            )
-
-            total_mobility += type_mobility
-
-        return total_mobility
-
+        def calculate_piece_active_count(hex_key):
+            """
+            Calculate mobility for a specific hex
+            
+            :param hex_key: The hex coordinate to check
+            :return: Tuple of mobility updates or None if no update needed
+            """
+            if board.hex_empty(hex_key):
+                return None
+            
+            piece = board.board[hex_key][-1]
+            active_key = (piece.piece_type, piece.piece_name)
+            
+            # Only process pieces we're tracking
+            if active_key not in pieces_active:
+                return None
+            
+            is_active= board.can_move_without_breaking_hive(hex_key)
+            
+            return (active_key, 1 if is_active else 0)
+        
+        # Use ThreadPoolExecutor for concurrent processing
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            # Submit tasks for each hex on the board
+            future_to_hex = {executor.submit(calculate_piece_active_count, hex_key): hex_key 
+                            for hex_key in board.board.keys()}
+            
+            # Process results
+            for future in as_completed(future_to_hex):
+                result = future.result()
+                if result is not None:
+                    active_key, moves = result
+                    with mobility_lock:
+                        pieces_active[active_key] += moves
+        
+        return pieces_active
     def _around_queen(self, board: Board, role):
         """
         Evaluate the safety of the Queen Bee
