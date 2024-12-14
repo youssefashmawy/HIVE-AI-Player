@@ -11,7 +11,11 @@ class HiveGameOver:
         Display the endgame screen with the result ('white', 'black', or 'draw')
         :param result: The result of the game
         """
-        Consts.WIN.blit(Consts.background_image, (0, 0))
+        # Create a semi-transparent overlay
+        overlay = pygame.Surface(Consts.WIN.get_size(), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 128))  # Semi-transparent black
+        Consts.WIN.blit(overlay, (0, 0))
+
         font = pygame.font.Font(None, 74)  # Example font size
 
         if result == "draw":
@@ -22,7 +26,7 @@ class HiveGameOver:
             text = "Game Over: Black Wins!"
 
         # Render the text
-        text_surface = font.render(text, True, Consts.BLACK)
+        text_surface = font.render(text, True, Consts.WHITE)
         text_rect = text_surface.get_rect(
             center=(self.screen.get_width() // 2, self.screen.get_height() // 2)
         )
@@ -30,7 +34,7 @@ class HiveGameOver:
 
         # Prompt for the next action
         prompt_text = "Press 'Q': Quit, 'M': Menu"
-        prompt_text_surface = font.render(prompt_text, True, Consts.BLACK)
+        prompt_text_surface = font.render(prompt_text, True, Consts.WHITE)
         prompt_text_rect = prompt_text_surface.get_rect(
             center=(self.screen.get_width() // 2, self.screen.get_height() // 2 + 100)
         )

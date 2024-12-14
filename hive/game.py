@@ -129,9 +129,6 @@ class HiveGame:
         """
 
         for event in events:
-            if event.type == pygame.QUIT:
-                return False
-
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 # handle inventory clicks
                 white_inventory_selected_item: Item = self.white_inventory.handle_click(
@@ -319,7 +316,7 @@ class HiveGame:
             self.clock.tick(Consts.FPS)
 
 
-    def end_game_result(self,events:list[pygame.event.Event]) -> Literal["white", "black", "draw","exit", None]:
+    def end_game_result(self,events:list[pygame.event.Event]) -> Literal["white", "black", "draw","menu","exit", None]:
         white_win = self.board.is_endgame("black")  # white wins if black is gameover
         black_win = self.board.is_endgame("white")  # black wins if white is gameover
         
@@ -338,7 +335,11 @@ class HiveGame:
         for event in events:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_m:  # 'm' to get menu
+                    return "menu"
+                if event.key == pygame.K_q: # 'q' to quit the game
                     return "exit"  
+            if event.type == pygame.QUIT:
+                return "exit"
             
         return None
 

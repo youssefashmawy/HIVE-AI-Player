@@ -1,12 +1,13 @@
 from typing import Literal
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any,Generator
 import random
 from hive.piece import Ant, Beetle, Queen, Hopper, Spider, Piece
 from hive.board import Board
 from hive.hex import Hex
 
 from hive.ui.inventory import Inventory, Item
-
+import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 class Node:
     def __init__(
@@ -30,6 +31,8 @@ class Node:
     def get_inventory_from_turn(self):
         return self.white_inventory if self.is_role_white() else self.black_inventory
 
+    def is_queen_placed(self):
+        return self.board.get_queen_location(self.get_type_from_turn()) is not None
     def _create_piece(self, piece_type, role) -> Piece:
         """
         Create a piece based on type and role
@@ -140,7 +143,7 @@ class HiveMinMaxAI:
         self.role = role
         difficulty = difficulty.lower()
         self.difficulty = difficulty
-        self.max_depth = 1 if difficulty == "easy" else 2 
+        self.max_depth = 1 if difficulty == "easy" else 2 if difficulty == "medium" else 3
 
 
     def choose_best_move(
@@ -163,16 +166,10 @@ class HiveMinMaxAI:
         node = Node(board, white_inventory, black_inventory, turn)
 
         best_move = None
-        best_eval = float("-inf")
 
-        moves = self._generate_all_moves(node)
-
-        if not moves:
-            return None
-
-        alpha = float("-inf")
-        beta = float("inf")
-        for i, move in enumerate(moves):
+        alpha = -1000
+        beta = 1000
+        for i, move in enumerate(self._generate_all_moves(node)):
 
             # Apply the move
             node.apply_move(
@@ -191,12 +188,9 @@ class HiveMinMaxAI:
             node.undo_move(undo_stack)
 
             # Always maximize for the AI's own role
-            if eval_score > best_eval:
-                best_eval = eval_score
+            if eval_score > alpha:
+                alpha = eval_score
                 best_move = move
-
-            if best_eval > alpha:
-                alpha = best_eval
 
             if beta <= alpha:
                 break
@@ -205,14 +199,11 @@ class HiveMinMaxAI:
 
     def _minmax(self, node: Node, depth, is_maximizing, alpha, beta, undo_stack):
 
-        if depth == 0:
+        if depth == 0 or node.board.is_endgame("white") or node.board.is_endgame("black"):
             return self._evaluate_board(node)
 
-        moves = self._generate_all_moves(node)
-
         if is_maximizing:
-            max_eval = float("-inf")
-            for move in moves:
+            for move in self._generate_all_moves(node):
                 # Apply the move
                 node.apply_move(
                     move.get("from_hex", None),
@@ -224,16 +215,14 @@ class HiveMinMaxAI:
                 eval_score = self._minmax(
                     node, depth - 1, False, alpha, beta, undo_stack
                 )
-
-                max_eval = max(max_eval, eval_score)
-                alpha = max(alpha, max_eval)
                 node.undo_move(undo_stack)
+
+                alpha = max(alpha, eval_score)
                 if beta <= alpha:
                     break
-            return max_eval
+            return alpha
         else:
-            min_eval = float("inf")
-            for move in moves:
+            for move in self._generate_all_moves(node):
                 node.apply_move(
                     move.get("from_hex", None),
                     move.get("to_hex", None),
@@ -243,15 +232,14 @@ class HiveMinMaxAI:
                 eval_score = self._minmax(
                     node, depth - 1, True, alpha, beta, undo_stack
                 )
-
-                min_eval = min(min_eval, eval_score)
-                beta = min(beta, min_eval)
                 node.undo_move(undo_stack)
+
+                beta = min(beta, eval_score)
                 if beta <= alpha:
                     break
-            return min_eval
+            return beta
 
-    def _generate_all_moves(self, node: Node) -> List[Dict[str, Any]]:
+    def _generate_all_moves(self, node: Node) -> Generator[Dict[str, Any],None,None]:
         """
         Generate all possible moves for the current player
 
@@ -260,16 +248,22 @@ class HiveMinMaxAI:
         :param inventory: Current player's inventory
         :return: List of possible moves
         """
-        moves = []
 
         # Generate placement moves
         possible_placements = node.board.possible_inserts(
             node.get_type_from_turn(), node.turn
         )
-        for hex in possible_placements:
-            for item in node.get_inventory_from_turn():
-                if item.count > 0:
-                    moves.append({"type": "place", "piece": item.name, "to_hex": hex})
+
+        inventory= node.get_inventory_from_turn()
+        if (node.turn == 7 or node.turn == 8) and not node.is_queen_placed():
+            for hex in possible_placements:
+                yield {"type": "place", "piece": "Queen", "to_hex": hex}
+        else:
+            for hex in possible_placements:
+                # check if it turn is 7 or 8 and the queen is not there 
+                for item in inventory:
+                    if item.count > 0:
+                        yield {"type": "place", "piece": item.name, "to_hex": hex}
 
         # Generate movement moves
         for hex, pieces in node.board.board.items():
@@ -279,12 +273,43 @@ class HiveMinMaxAI:
                 )
                 for move_hex in possible_moves:
                     if move_hex in node.board.board:
-                        moves.append(
-                            {"type": "move", "from_hex": hex, "to_hex": move_hex}
-                        )
+                        yield {"type": "move", "from_hex": hex, "to_hex": move_hex}
+        
 
-        return moves
-
+    # Dynamic mobility weights based on game turn
+    def _calculate_dynamic_weights(self,turn):
+        """
+        Calculate mobility weights that change throughout the game
+        
+        Early game (turns 1-6): Focus on piece placement and queen protection
+        Mid game (turns 7-12): Balanced mobility and strategic positioning
+        Late game (turns 13+): Aggressive mobility and queen threat
+        """
+        if turn <= 12:
+            # Early game: Prioritize queen and strategic piece placement
+            return {
+                "Beetle": 3,  # Can block and protect queen
+                "Hopper": 2,  # Limited but strategic placement
+                "Spider": 2,  # Careful movement
+                "Ant": 1,  # Less important early
+            }
+        elif turn <= 24:
+            # Mid game: Balanced approach
+            return {
+                "Ant": 5,  # Increasing mobility importance
+                "Spider": 4,  # Strategic movement
+                "Beetle": 3,  # Flexible positioning
+                "Hopper": 2,  # Situational utility
+            }
+        else:
+            # Late game: Aggressive mobility and queen threat
+            return {
+                "Ant": 6,  # Maximum mobility crucial
+                "Spider": 5,  # Complex movement
+                "Beetle": 4,  # Blocking and attacking
+                "Hopper": 3,  # More strategic importance
+            }
+            
     def _evaluate_board(self, node: Node):
         """
         Advanced board evaluation with multiple heuristics
@@ -301,40 +326,90 @@ class HiveMinMaxAI:
         role = self.role
         opponent_role = "black" if role == "white" else "white"
 
-        # Piece type mobility weights (higher means more strategic importance)
-        if self.difficulty == "hard":
-            mobility_weights = {
-                "Ant": 4,  # Highly mobile
-                "Spider": 3,  # Strategic movement
-                "Beetle": 2,  # Can climb and block
-                "Hopper": 1,  # Limited mobility
-            }
-            # 1. Piece Mobility Heuristics
-            role_mobility = self._calculate_piece_mobility(board, role, mobility_weights)
-            opponent_mobility = self._calculate_piece_mobility(
-                board, opponent_role, mobility_weights
-            )
+        # 2. Queen Bee Safety Heuristic
+        around_queen_role = self._around_queen(board, role)
+        around_queen_opponent = self._around_queen(board, opponent_role)
 
-            score += role_mobility - opponent_mobility
+        score += (around_queen_opponent-around_queen_role) * 10
+        
+        if around_queen_opponent == 6:
+            return 1000
+        
+        # Get current turn-based weights
+        current_weights = self._calculate_dynamic_weights(node.turn)
 
-        if self.difficulty == "medium" or self.difficulty == "hard":
-            # 2. Queen Bee Safety Heuristic
-            role_queen_safety = self._evaluate_queen_safety(board, role)
-            opponent_queen_safety = self._evaluate_queen_safety(board, opponent_role)
 
-            score += (role_queen_safety - opponent_queen_safety) * 3
+        pieces_mobility = self._calculate_pieces_mobility(board)
 
-        # 4. Endgame Detection (Massive score adjustment)
-        if board.is_endgame(role):
-            score += float("inf")  # Winning condition
-        elif board.is_endgame(opponent_role):
-            score -= float("inf")  # Losing condition
+        # Calculate mobility score
+        for (color, piece_type), mobility in pieces_mobility.items():
+            # Apply weight based on the piece type
+            weight = current_weights.get(piece_type, 1)
+            
+            # Adjust score based on mobility and color
+            if color == role:
+                score += mobility * weight
+            else:
+                score -= mobility * weight
 
         # add random noise between -10 and 0 for ai vs ai
         score += random.randint(-10, 0)
 
-        return score
+        return score 
 
+    def _calculate_pieces_mobility(self, board: Board):
+        """
+        Calculate the mobility score for each piece type for a given role using threading
+        """
+        # Initialize pieces_mobility dictionary
+        pieces_mobility = {
+            ("black", "Ant"): 0,
+            ("black", "Hopper"): 0,
+            ("white", "Ant"): 0,
+            ("white", "Hopper"): 0,
+        }
+        
+        # Lock for thread-safe updates to the shared dictionary
+        mobility_lock = threading.Lock()
+        
+        def calculate_piece_mobility(hex_key):
+            """
+            Calculate mobility for a specific hex
+            
+            :param hex_key: The hex coordinate to check
+            :return: Tuple of mobility updates or None if no update needed
+            """
+            if board.hex_empty(hex_key):
+                return None
+            
+            piece = board.board[hex_key][-1]
+            mobility_key = (piece.piece_type, piece.piece_name)
+            
+            # Only process pieces we're tracking
+            if mobility_key not in pieces_mobility:
+                return None
+            
+            # Calculate possible moves for this piece
+            possible_moves = len(board.possible_moves(hex_key, piece.piece_type))
+            
+            return (mobility_key, possible_moves)
+        
+        # Use ThreadPoolExecutor for concurrent processing
+        with ThreadPoolExecutor(max_workers=4) as executor:
+            # Submit tasks for each hex on the board
+            future_to_hex = {executor.submit(calculate_piece_mobility, hex_key): hex_key 
+                            for hex_key in board.board.keys()}
+            
+            # Process results
+            for future in as_completed(future_to_hex):
+                result = future.result()
+                if result is not None:
+                    mobility_key, moves = result
+                    with mobility_lock:
+                        pieces_mobility[mobility_key] += moves
+        
+        return pieces_mobility
+        
     def _calculate_piece_mobility(self, board: Board, role, mobility_weights):
         """
         Calculate mobility score for each piece type for a given role
@@ -362,7 +437,7 @@ class HiveMinMaxAI:
 
         return total_mobility
 
-    def _evaluate_queen_safety(self, board: Board, role):
+    def _around_queen(self, board: Board, role):
         """
         Evaluate the safety of the Queen Bee
         """
@@ -376,4 +451,4 @@ class HiveMinMaxAI:
         blocked_hexes = sum(1 for hex in adjacent_hexes if not board.hex_empty(hex))
 
         # The more blocked hexes around the queen, the worse the safety
-        return 6 - blocked_hexes
+        return blocked_hexes
