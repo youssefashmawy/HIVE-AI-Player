@@ -377,8 +377,8 @@ class HiveMinMaxAI:
             else:
                 score -= mobility * weight
 
-        # add random noise between -10 and 0 for ai vs ai
-        score += random.randint(-20, 0)
+        # add random noise between -5 and 0 for ai vs ai
+        score += random.randint(-5, 0)
 
         return score 
 

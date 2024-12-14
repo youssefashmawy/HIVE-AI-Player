@@ -22,6 +22,24 @@ class Board:
 
         self.white_queen_location: Hex = None
         self.black_queen_location: Hex = None
+
+        self.spider_directions = {
+            Hex(0, -1): ((-1, 0), (1, -1)),
+            Hex(1, -1): ((0, -1), (1, 0)),
+            Hex(1, 0): ((1, -1), (0, 1)),
+            Hex(0, 1): ((1, 0), (-1, 1)),
+            Hex(-1, 1): ((0, 1), (-1, 0)),
+            Hex(-1, 0): ((-1, 1), (0, -1)),
+        }
+
+        self.slide_directions = {
+            (0, -1): ((-1, 0), (1, -1)),
+            (1, -1): ((0, -1), (1, 0)),
+            (1, 0): ((1, -1), (0, 1)),
+            (0, 1): ((1, 0), (-1, 1)),
+            (-1, 1): ((0, 1), (-1, 0)),
+            (-1, 0): ((-1, 1), (0, -1)),
+        }
         
 
     def __repr__(self):
@@ -216,14 +234,7 @@ class Board:
                     current_hex = next_hex
         elif isinstance(piece, Spider):
             # Check all hexes on the board
-            directions = {
-                Hex(0, -1): ((-1, 0), (1, -1)),
-                Hex(1, -1): ((0, -1), (1, 0)),
-                Hex(1, 0): ((1, -1), (0, 1)),
-                Hex(0, 1): ((1, 0), (-1, 1)),
-                Hex(-1, 1): ((0, 1), (-1, 0)),
-                Hex(-1, 0): ((-1, 1), (0, -1)),
-            }
+            
             queue = deque([(hex, 3)])
             visited = set()
             visited.add(hex)
@@ -237,7 +248,7 @@ class Board:
                     if not self.hex_inside_board(neighbor) or self.hex_empty(neighbor) or neighbor in visited:
                         continue
                     dir = neighbor - current_hex
-                    adj_directions = directions[dir]
+                    adj_directions = self.spider_directions[dir]
                     for adj_dir in adj_directions:
                         adj_hex = current_hex + Hex(*adj_dir)
                         if (
@@ -287,7 +298,18 @@ class Board:
         """
         Check if removing a piece from current_hex would break the hive connectivity
         """
+        # neighbors_count=0
+        # for adj_hex in current_hex.generate_adj_hexs():
+        #     if (
+        #         self.hex_inside_board(adj_hex)
+        #         and not self.hex_empty(adj_hex)
+        #     ):
+        #         neighbors_count
+                
+        # if neighbors_count !=2:
+        #     return True
 
+        
         # Get all hexes with pieces
         board_hexes = {hex for hex, pieces in self.board.items() if pieces}
 
@@ -352,18 +374,11 @@ class Board:
 
         dir_hex = to_hex - from_hex
         dir = (dir_hex.q, dir_hex.r)
-        directions = {
-            (0, -1): ((-1, 0), (1, -1)),
-            (1, -1): ((0, -1), (1, 0)),
-            (1, 0): ((1, -1), (0, 1)),
-            (0, 1): ((1, 0), (-1, 1)),
-            (-1, 1): ((0, 1), (-1, 0)),
-            (-1, 0): ((-1, 1), (0, -1)),
-        }
-        if dir not in directions:
+        
+        if dir not in self.slide_directions:
             return False
         counter = 0
-        adj_directions = directions[dir]
+        adj_directions = self.slide_directions[dir]
         for adj_dir in adj_directions:
             adj_hex = from_hex + Hex(*adj_dir)
             if self.hex_inside_board(adj_hex) and not self.hex_empty(adj_hex):

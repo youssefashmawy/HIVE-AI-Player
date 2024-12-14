@@ -1,9 +1,12 @@
+
+
 class Hex:
     def __init__(self, q: int, r: int):
         # Axial coordinates
         self.q = q
         self.r = r
         self.s = -q - r
+        
 
     def __eq__(self, other: "Hex"):
         return (self.q, self.r) == (other.q, other.r)
@@ -30,15 +33,8 @@ class Hex:
         return [self+dir for dir in self.generate_directions()]
     
     def generate_directions(self)-> list["Hex"]:
-        directions = {
-            "North": Hex(0,-1),
-            "North_east": Hex(1,-1),
-            "South_east": Hex(1, 0),
-            "South": Hex(0,1),
-            "South_west": Hex(-1,1),
-            "North_west": Hex(-1, 0),
-        }
-        return list(directions.values())
+        return DIRECTIONS
+    
     def distance(self, other: "Hex") -> int:
         """
         Calculate the hexagonal distance between this hex and another hex.
@@ -47,3 +43,13 @@ class Hex:
         :return: The hexagonal distance as an integer
         """
         return max(abs(self.q - other.q), abs(self.r - other.r), abs(self.s - other.s))
+    
+
+DIRECTIONS = [
+    Hex(0,-1),
+    Hex(1,-1),
+    Hex(1, 0),
+    Hex(0,1),
+    Hex(-1,1),
+    Hex(-1, 0),
+]
