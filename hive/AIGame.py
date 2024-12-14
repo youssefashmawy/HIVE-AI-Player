@@ -6,8 +6,8 @@ from hive.board import Board
 from hive.hex import Hex
 
 from hive.ui.inventory import Inventory, Item
-import cProfile
-import pstats
+# import cProfile
+# import pstats
 
 class Node:
     def __init__(
