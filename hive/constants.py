@@ -7,7 +7,7 @@ from .helper import resource_path
 
 
 class Consts:
-    WIDTH, HEIGHT = 900, 750
+    WIDTH, HEIGHT = 1300, 850
 
     WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 
@@ -15,6 +15,7 @@ class Consts:
     BLACK = (0, 0, 0)
     BLUE = (0, 0, 255)
     WHITE = (255, 255, 255)
+    LIGHT_GREY = (175, 175, 175)
     GREY = (128, 128, 128)
     CYAN = (0, 255, 255)
     GREEN = (0, 255, 0)
@@ -81,6 +82,7 @@ class Consts:
     ITEM_SIZE = 50
     BOARD_SIZE = (800, 500)
     BOARD_POS = (0, 0)
+    INVENTORY_WIDTH = 320
     INVENTORY_HEIGHT = 100
 
     LOGO_SCALING = (INVENTORY_HEIGHT - 20, INVENTORY_HEIGHT - 20)

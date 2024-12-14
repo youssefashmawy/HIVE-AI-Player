@@ -5,7 +5,7 @@ import random
 from hive.ui.menu import HiveMenu
 from hive.ui.gameover import HiveGameOver
 from hive.game import HiveGame
-
+from hive.constants import Consts
 
 
 def main():
@@ -17,7 +17,7 @@ def main():
     # Get game configuration
     while True:
         # Create menu
-        menu = HiveMenu()
+        menu = HiveMenu(Consts.WIDTH, Consts.HEIGHT)
         game_config = menu.main_menu()
 
         # If user quits from menu

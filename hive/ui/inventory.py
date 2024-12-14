@@ -22,7 +22,7 @@ class Item:
         if self.rect:
             # Draw a highlight if selected
             if self.selected:
-                pygame.draw.rect(screen, Consts.RED, self.rect.inflate(4, 4), 3)
+                pygame.draw.rect(screen, Consts.RED, self.rect.inflate(4, 4), 3,8)
             # Draw item box
 
             if self.image:
@@ -33,7 +33,7 @@ class Item:
                     self.rect,
                 )
             count_text = pygame.font.Font(None, 24).render(
-                f"x{self.count}", True, Consts.BLACK
+                f"x{self.count}", True, Consts.WHITE
             )
             screen.blit(
                 count_text,
@@ -56,7 +56,7 @@ class Inventory:
 
     def draw(self, screen: pygame.Surface):
         pygame.draw.rect(
-            screen, Consts.BLACK, (self.x, self.y, 320, Consts.INVENTORY_HEIGHT), 2
+            screen, Consts.BLACK, (self.x, self.y, Consts.INVENTORY_WIDTH, Consts.INVENTORY_HEIGHT), 2
         )
         for i, item in enumerate(self.items):
             item.set_position(self.x + 10 + i * (Consts.ITEM_SIZE + 10), self.y + 10)

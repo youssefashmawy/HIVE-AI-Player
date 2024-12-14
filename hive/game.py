@@ -49,7 +49,7 @@ class HiveGame:
 
         self.hive_board = HiveBoard()
 
-        self.board = Board(7)
+        self.board = Board(13)
         self.game_config = game_config
 
         # Player interaction variables
@@ -67,7 +67,7 @@ class HiveGame:
             0, Consts.WIN.get_height() - Consts.INVENTORY_HEIGHT, "white"
         )
         self.black_inventory = Inventory(
-            480, Consts.WIN.get_height() - Consts.INVENTORY_HEIGHT, "black"
+            Consts.WIN.get_width() - Consts.INVENTORY_WIDTH, Consts.WIN.get_height() - Consts.INVENTORY_HEIGHT, "black"
         )
 
         self.setup_inventories()
@@ -246,7 +246,7 @@ class HiveGame:
 
         self.white_inventory.draw(Consts.WIN)  # Draw white inventory
         Consts.WIN.blit(
-            Consts.logo_image, (360, Consts.WIN.get_height() - Consts.INVENTORY_HEIGHT)
+            Consts.logo_image, (610, Consts.WIN.get_height() - Consts.INVENTORY_HEIGHT)
         )
         self.black_inventory.draw(Consts.WIN)  # Draw black inventory
 

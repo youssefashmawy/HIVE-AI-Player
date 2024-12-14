@@ -115,13 +115,13 @@ class HiveBoard:
             # Draw all hexes on the board as white initially
             for hex in board.board.keys():
                 self._hexes.append(
-                    (hex, self.draw_hex(hex, color=Consts.WHITE, width=1))
+                    (hex, self.draw_hex(hex, color=Consts.LIGHT_GREY, width=1))
                 )  # Fill white hexagon
 
             return
         # Draw all hexes on the board as white initially
         for hex in board.board.keys():
-            self.draw_hex(hex, color=Consts.WHITE, width=1)  # Fill white hexagon
+            self.draw_hex(hex, color=Consts.LIGHT_GREY, width=1)  # Fill white hexagon
 
         # Draw pieces on the board
         self.draw_pieces(board)
