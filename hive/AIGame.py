@@ -330,11 +330,12 @@ class HiveMinMaxAI:
         Advanced board evaluation with multiple heuristics
 
         Heuristics include:
-        1. Piece mobility for each piece type
-        2. Queen bee safety
-        3. Overall piece mobility
-        4. Strategic piece placement
-        5. Winning condition detection
+        1. Queen bee safety
+        2. end game detection
+        3. dynamic wights (early,mid,late)
+        4. mobility score
+        5. active pieces count
+        6. random small noise to prevent infinti loops in AI vs AI
         """
         score = 0
         board = node.board
@@ -365,17 +366,17 @@ class HiveMinMaxAI:
             else:
                 score -= mobility * weight
 
+        # Calculate active count
         pieces_active = self._calculate_pieces_active_count(board)
-        # Calculate mobility score
         for (color, piece_type), mobility in pieces_active.items():
-            # Apply weight based on the piece type
-            weight = current_weights.get(piece_type, 1)
+            # Apply count based on the piece type
+            count = current_weights.get(piece_type, 1)
             
-            # Adjust score based on mobility and color
+            # Adjust score based on count and color
             if color == role:
-                score += mobility * weight
+                score += count * weight
             else:
-                score -= mobility * weight
+                score -= count * weight
 
         # add random noise between -5 and 0 for ai vs ai
         score += random.randint(-5, 0)
